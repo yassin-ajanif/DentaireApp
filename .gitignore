@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+[Dd]eployment/
+
+.vs/
+.idea/
+.vscode/
+
+TestResults/
+*.user
+*.suo
+*.log
+*.tmp

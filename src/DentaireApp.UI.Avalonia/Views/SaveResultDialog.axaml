@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DentaireApp.UI.Avalonia.Views.SaveResultDialog"
+        Width="420"
+        Height="180"
+        CanResize="False"
+        Title="Resultat Enregistrement">
+  <Grid Margin="16" RowDefinitions="*,Auto" RowSpacing="12">
+    <TextBlock x:Name="MessageTextBlock"
+               TextWrapping="Wrap"
+               VerticalAlignment="Center" />
+    <Button Grid.Row="1"
+            HorizontalAlignment="Right"
+            Content="OK"
+            Width="84"
+            Click="OnOkClick" />
+  </Grid>
+</Window>
+

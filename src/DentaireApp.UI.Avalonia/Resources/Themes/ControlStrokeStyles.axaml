@@ -1,0 +1,39 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Fluent often paints borders on PART_BorderElement; set both control and template -->
+
+  <Style Selector="TextBox">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+  <Style Selector="TextBox /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+  <Style Selector="TextBox:disabled /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+  <Style Selector="ComboBox /template/ Border#PART_PopupBorder">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+
+  <Style Selector="NumericUpDown">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+
+  <Style Selector="DatePicker">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+
+  <Style Selector="TimePicker">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+
+  <Style Selector="DataGrid">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.System}" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Brush.Stroke.System}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Brush.Stroke.System}" />
+  </Style>
+</Styles>

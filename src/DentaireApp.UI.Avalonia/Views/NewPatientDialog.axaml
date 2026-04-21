@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DentaireApp.UI.Avalonia.Views.NewPatientDialog"
+        Width="420"
+        Height="300"
+        Title="Nouveau Numero">
+  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="8" ColumnSpacing="8">
+    <TextBlock Text="Nom" />
+    <TextBox x:Name="NomTextBox" Grid.Column="1" />
+
+    <TextBlock Grid.Row="1" Text="Age" />
+    <TextBox x:Name="AgeTextBox" Grid.Row="1" Grid.Column="1" />
+
+    <TextBlock Grid.Row="2" Text="Adresse" />
+    <TextBox x:Name="AdresseTextBox" Grid.Row="2" Grid.Column="1" />
+
+    <TextBlock Grid.Row="3" Text="Telephone" />
+    <TextBox x:Name="TelephoneTextBox" Grid.Row="3" Grid.Column="1" />
+
+    <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Annuler" Click="OnCancelClick" />
+      <Button x:Name="SaveButton" Content="Enregistrer" Click="OnSaveClick" />
+    </StackPanel>
+
+    <TextBlock x:Name="FeedbackTextBlock"
+               Grid.Row="5"
+               Grid.ColumnSpan="2"
+               Foreground="IndianRed"
+               TextWrapping="Wrap" />
+  </Grid>
+</Window>
+

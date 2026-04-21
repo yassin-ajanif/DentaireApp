@@ -1,0 +1,309 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DentaireApp.UI.Avalonia.ViewModels"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="DentaireApp.UI.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        MinWidth="1160"
+        MinHeight="620"
+        Title="DentaireApp.UI.Avalonia">
+
+    <Window.Styles>
+        <Style Selector="TextBox.queue-search">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Padding" Value="10,6" />
+            <!-- Fluent theme uses a larger default MinHeight; allow compact Height -->
+            <Setter Property="MinHeight" Value="0" />
+        </Style>
+        <Style Selector="Button.queue-nav">
+            <Setter Property="FontFamily" Value="'JetBrains Mono', 'Cascadia Mono', Consolas, 'Courier New', 'Liberation Mono', monospace" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="CornerRadius" Value="6" />
+            <!-- Inset from inner Border; keep 0 here -->
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="ClipToBounds" Value="False" />
+        </Style>
+        <!-- Do not set Padding here — it overrides Fluent TemplateBinding and breaks Button.Padding -->
+        <Style Selector="Button.queue-nav /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.queue-nav-nouveau /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.queue-nav-shadow">
+            <Setter Property="CornerRadius" Value="10" />
+            <!--<Setter Property="BoxShadow" Value="0 4 12 0 #45000000" />-->
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="ClipToBounds" Value="False" />
+        </Style>
+        <Style Selector="Button.queue-nav-prev">
+            <Setter Property="Background" Value="#B8B8B8" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.queue-nav-prev:pointerover">
+            <Setter Property="Background" Value="#A3A3A3" />
+        </Style>
+        <Style Selector="Button.queue-nav-next">
+            <Setter Property="Background" Value="#7A9E7E" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.queue-nav-next:pointerover">
+            <Setter Property="Background" Value="#6A8E6E" />
+        </Style>
+    </Window.Styles>
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <svg:Svg Path="/Assets/background.svg"
+                 Stretch="Fill" />
+        <TabControl Margin="0">
+            <TabControl.Styles>
+                <Style Selector="TabStrip">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+            </TabControl.Styles>
+            <TabItem Header="Queue">
+                <!-- 3 columns: logo band | queue (never paints into col 2) | buttons. Overflow was fixed-width queue wider than * column. -->
+                <Grid DataContext="{Binding Queue}"
+                      Margin="24,52,24,0"
+                      RowDefinitions="Auto,*"
+                      RowSpacing="18"
+                      ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="400" />
+                        <ColumnDefinition Width="*" MinWidth="300" />
+                        <ColumnDefinition Width="Auto" MinWidth="168" />
+                    </Grid.ColumnDefinitions>
+                    <!-- Column 0: intentionally empty (branding / tooth art on background.svg) -->
+                    <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                            Background="Transparent"
+                            IsHitTestVisible="False" />
+
+                    <!-- Middle column: clip + max width so list/search never draw over the button column -->
+                    <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                            ClipToBounds="True"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Grid RowDefinitions="Auto,*"
+                              MaxWidth="540"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Stretch">
+                            <Border Grid.Row="0"
+                                    Margin="0,0,0,18"
+                                    HorizontalAlignment="Stretch"
+                                    MaxWidth="540">
+                                <TextBox Classes="queue-search"
+                                         Watermark="Search patient"
+                                         Text="{Binding SearchTerm}"
+                                         MinHeight="0"
+                                         Height="34"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Left" />
+                            </Border>
+
+                            <ListBox Grid.Row="1"
+                                     ItemsSource="{Binding Items}"
+                                     SelectedItem="{Binding SelectedItem}"
+                                     HorizontalAlignment="Stretch"
+                                     MaxWidth="540"
+                                     Background="Transparent"
+                                     BorderThickness="0">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Margin" Value="0,0,0,9" />
+                                <Setter Property="Background" Value="#00FFFFFF" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected">
+                                <Setter Property="Background" Value="#2E4682" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected TextBlock">
+                                <Setter Property="Foreground" Value="White" />
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Traiter patient" />
+                                <MenuItem Header="Dossier patient" />
+                                <MenuItem Header="Modifier informations patient" Click="OnEditPatientCredentialsClick" />
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:QueueItemViewModel">
+                                <Border Padding="13,9"
+                                        CornerRadius="4"
+                                        PointerPressed="OnQueueItemPointerPressed">
+                                    <!-- Badge | name | fixed gap | * stretch | time -->
+                                    <Grid ColumnDefinitions="48,Auto,72,*,Auto"
+                                          ColumnSpacing="0">
+                                        <Border Width="40" Height="30" CornerRadius="4" Background="#D9D9D9">
+                                            <TextBlock Text="{Binding Number}"
+                                                       FontSize="15"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Nom}"
+                                                   Margin="12,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#2E4682" />
+                                        <!-- Static width between name and flexible space (tunes row width) -->
+                                        <Panel Grid.Column="2" Background="Transparent" />
+                                        <TextBlock Grid.Column="4"
+                                                   Text="{Binding PredictedInterval}"
+                                                   Margin="10,0,0,0"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="15"
+                                                   Foreground="#7A9E7E" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <Button Grid.Row="0" Grid.Column="2"
+                            Classes="queue-nav queue-nav-nouveau"
+                            Content="Nouveau"
+                            Command="{Binding NouveauNumeroCommand}"
+                            MinHeight="0"
+                            Width="150"
+                            Height="50"
+                            Padding="12,0"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="#2E4682"
+                            Foreground="White" />
+
+                   
+                   
+                   
+                 
+                 
+                 
+                    <Border Grid.Row="1" Grid.Column="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <StackPanel VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Spacing="14"
+                                    ClipToBounds="False">
+                            <Border Classes="queue-nav-shadow" HorizontalAlignment="Center">
+                                <Button Classes="queue-nav queue-nav-prev"
+                                        Command="{Binding PrecedentCommand}"
+                                        HorizontalAlignment="Center"
+                                        MinHeight="0"
+                                        Height="54"
+                                        Width="150"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center">
+                                    <Border Padding="0,0" HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Spacing="4">
+                                            <TextBlock Text="Précédent"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="White"
+                                                       TextWrapping="NoWrap" />
+                                            <svg:Svg Path="/Assets/chevron-double-up.svg"
+                                                     Width="26"
+                                                     Height="26"
+                                                     Stretch="Uniform"
+                                                     VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Button>
+                            </Border>
+                            <Border Classes="queue-nav-shadow" HorizontalAlignment="Center">
+                                <Button Classes="queue-nav queue-nav-next"
+                                        Command="{Binding SuivantCommand}"
+                                        HorizontalAlignment="Center"
+                                        MinHeight="0"
+                                        Height="50"
+                                        Width="150"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center">
+                                    <Border Padding="8,8" HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Spacing="4">
+                                            <TextBlock Text="Suivant"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="White"
+                                                       TextWrapping="NoWrap" />
+                                            <svg:Svg Path="/Assets/chevron-double-down.svg"
+                                                     Width="26"
+                                                     Height="26"
+                                                     Stretch="Uniform"
+                                                     VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Button>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Dossier patient">
+                <Grid DataContext="{Binding PatientRecord}" RowDefinitions="Auto,*,Auto,Auto" Margin="0,8,0,0" RowSpacing="8">
+                    <Border Padding="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                            <TextBlock Text="Nom *" />
+                            <TextBox Grid.Column="1" Text="{Binding Nom}" />
+                            <TextBlock Grid.Column="2" Text="Telephone *" />
+                            <TextBox Grid.Column="3" Text="{Binding Telephone}" />
+
+                            <TextBlock Grid.Row="1" Text="Age" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Age}" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Adresse" />
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Adresse}" />
+                        </Grid>
+                    </Border>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Lines}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Dates" Binding="{Binding Date}"/>
+                            <DataGridTextColumn Header="Natures des Opérations" Binding="{Binding NatureOperation}"/>
+                            <DataGridTextColumn Header="Prix Conven" Binding="{Binding PrixConven}"/>
+                            <DataGridTextColumn Header="Reçu" Binding="{Binding Recu}"/>
+                            <DataGridTextColumn Header="A Recevoir" Binding="{Binding ARecevoir}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="Annuler" Command="{Binding AnnulerCommand}" />
+                        <Button Content="Enregistrer" Command="{Binding EnregistrerCommand}" />
+                        <Button Content="+" Command="{Binding AddSheetCommand}" />
+                    </StackPanel>
+                    <TextBlock Grid.Row="3" Text="{Binding SaveMessage}" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+
+</Window>
