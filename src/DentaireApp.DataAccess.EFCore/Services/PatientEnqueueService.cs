@@ -1,4 +1,4 @@
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Appointments;
 using DentaireApp.Business.Models.Patients;
 using DentaireApp.DataAccess.EFCore.Persistence;
@@ -6,31 +6,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DentaireApp.DataAccess.EFCore.Services;
 
-public sealed class PatientEnqueueService(AppDbContext db) : IPatientEnqueueService
+public class PatientEnqueueService(AppDbContext db) : IAppointmentEnqueuePersistence
 {
-    public async Task<PatientEnqueueResult> RegisterAndEnqueueTodayAsync(
-        PatientRegistrationRequest request,
+    public async Task<AppointmentEnqueueResult> EnqueueAsync(
+        Patient patientDraft,
+        Appointment appointmentDraft,
         CancellationToken cancellationToken = default)
     {
-        var nom = request.Nom.Trim();
-        var telephone = request.Telephone.Trim();
-        var adresse = request.Adresse.Trim();
+        var telephone = patientDraft.Telephone;
 
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var patient = await db.Patients
-                .FirstOrDefaultAsync(
-                    x => x.Nom == nom && x.Telephone == telephone,
-                    cancellationToken);
+                .FirstOrDefaultAsync(x => x.Telephone == telephone, cancellationToken);
 
             if (patient is null)
             {
                 patient = new Patient
                 {
-                    Nom = nom,
-                    Age = request.Age,
-                    Adresse = adresse,
+                    Nom = patientDraft.Nom,
+                    Age = patientDraft.Age,
+                    Adresse = patientDraft.Adresse,
                     Telephone = telephone,
                 };
                 db.Patients.Add(patient);
@@ -50,14 +47,14 @@ public sealed class PatientEnqueueService(AppDbContext db) : IPatientEnqueueServ
             {
                 PatientId = patient.Id,
                 QueueNumber = maxQueue + 1,
-                Status = AppointmentStatus.Waiting,
+                Status = appointmentDraft.Status,
             };
             db.Appointments.Add(appointment);
 
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
-            return new PatientEnqueueResult(patient, appointment);
+            return new AppointmentEnqueueResult(patient, appointment);
         }
         catch
         {

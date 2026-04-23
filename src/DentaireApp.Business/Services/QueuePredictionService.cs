@@ -1,10 +1,10 @@
 using DentaireApp.Business.Common;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Services;
 using Microsoft.Extensions.Options;
 
 namespace DentaireApp.Business.Services;
 
-public sealed class QueuePredictionService(IOptions<QueuePredictionOptions> options) : IQueuePredictionService
+public class QueuePredictionService(IOptions<QueuePredictionOptions> options) : IQueuePredictionService
 {
     private readonly QueuePredictionOptions _options = options.Value;
 

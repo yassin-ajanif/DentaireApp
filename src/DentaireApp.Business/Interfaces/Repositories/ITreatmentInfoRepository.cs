@@ -1,6 +1,6 @@
 using DentaireApp.Business.Models.Patients;
 
-namespace DentaireApp.Business.Contracts.Repositories;
+namespace DentaireApp.Business.Interfaces.Repositories;
 
 public interface ITreatmentInfoRepository
 {
@@ -10,4 +10,3 @@ public interface ITreatmentInfoRepository
     Task SaveAsync(TreatmentInfo treatmentInfo, CancellationToken cancellationToken = default);
     Task ReplaceByPatientIdAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default);
 }
-

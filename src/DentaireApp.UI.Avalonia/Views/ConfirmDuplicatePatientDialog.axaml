@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DentaireApp.UI.Avalonia.Views.ConfirmDuplicatePatientDialog"
+        Width="440"
+        Height="220"
+        CanResize="False"
+        Title="Patient existant">
+  <Grid Margin="16" RowDefinitions="*,Auto" RowSpacing="12">
+    <StackPanel VerticalAlignment="Center" Spacing="10">
+      <TextBlock TextWrapping="Wrap">
+        <Run Text="Un patient avec ce numéro existe déjà : " />
+        <Run x:Name="PatientNameRun"
+             FontWeight="Black"
+             BaselineAlignment="TextBottom" />
+      </TextBlock>
+      <TextBlock TextWrapping="Wrap"
+                 Text="Ajouter ce rendez-vous à la file ?" />
+    </StackPanel>
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+      <Button Content="Non"
+              Width="84"
+              Click="OnNoClick" />
+      <Button Content="Oui"
+              Width="84"
+              Click="OnYesClick" />
+    </StackPanel>
+  </Grid>
+</Window>

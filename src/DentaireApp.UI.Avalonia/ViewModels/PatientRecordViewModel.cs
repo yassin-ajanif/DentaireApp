@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DentaireApp.Business.Contracts.Repositories;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Repositories;
+using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Patients;
 using System;
 using System.Collections.ObjectModel;

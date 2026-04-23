@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -12,14 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentaireApp.DataAccess.EFCore", "src\DentaireApp.DataAccess.EFCore\DentaireApp.DataAccess.EFCore.csproj", "{6BF735C2-DBBE-47FB-80D7-47B551BDD39B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentaireApp.Bootstrap", "src\DentaireApp.Bootstrap\DentaireApp.Bootstrap.csproj", "{7012B691-3A39-4E6B-9F13-EB579E72FDC2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C6FE657-09B1-4C96-8120-412A05FB0010}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentaireApp.Business.Tests", "tests\DentaireApp.Business.Tests\DentaireApp.Business.Tests.csproj", "{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentaireApp.DataAccess.Tests", "tests\DentaireApp.DataAccess.Tests\DentaireApp.DataAccess.Tests.csproj", "{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentaireApp.UI.Tests", "tests\DentaireApp.UI.Tests\DentaireApp.UI.Tests.csproj", "{9E301E4F-E147-4E84-B8AA-11BFE7AAA306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,26 +38,11 @@ Global
 		{7012B691-3A39-4E6B-9F13-EB579E72FDC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7012B691-3A39-4E6B-9F13-EB579E72FDC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7012B691-3A39-4E6B-9F13-EB579E72FDC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E301E4F-E147-4E84-B8AA-11BFE7AAA306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E301E4F-E147-4E84-B8AA-11BFE7AAA306}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E301E4F-E147-4E84-B8AA-11BFE7AAA306}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E301E4F-E147-4E84-B8AA-11BFE7AAA306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B61AADC4-91E1-491D-AE4F-386355478889} = {15F46EE9-1C2A-4E10-9EA7-58F7F6B235E1}
 		{8271F9C9-B7E4-40EE-B200-731C3217F613} = {15F46EE9-1C2A-4E10-9EA7-58F7F6B235E1}
 		{6BF735C2-DBBE-47FB-80D7-47B551BDD39B} = {15F46EE9-1C2A-4E10-9EA7-58F7F6B235E1}
 		{7012B691-3A39-4E6B-9F13-EB579E72FDC2} = {15F46EE9-1C2A-4E10-9EA7-58F7F6B235E1}
-		{591A4AC8-5DC8-45A1-BFF0-3C54D64011D6} = {7C6FE657-09B1-4C96-8120-412A05FB0010}
-		{9F65F2E2-EA11-4AD9-ADB8-B94F3A60C66F} = {7C6FE657-09B1-4C96-8120-412A05FB0010}
-		{9E301E4F-E147-4E84-B8AA-11BFE7AAA306} = {7C6FE657-09B1-4C96-8120-412A05FB0010}
 	EndGlobalSection
 EndGlobal

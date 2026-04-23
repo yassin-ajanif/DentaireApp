@@ -19,6 +19,7 @@ public partial class MainWindow : Window
         if (DataContext is MainWindowViewModel vm)
         {
             vm.Queue.RequestNewPatientAsync = ShowNewPatientDialogAsync;
+            vm.Queue.ConfirmDuplicatePatientEnqueueAsync = ShowConfirmDuplicatePatientDialogAsync;
             vm.PatientRecord.ShowSaveResultAsync = ShowSaveResultDialogAsync;
             _ = vm.InitializeAsync();
         }
@@ -28,6 +29,12 @@ public partial class MainWindow : Window
     {
         var dialog = new NewPatientDialog();
         return await dialog.ShowDialog<NewPatientInput?>(this);
+    }
+
+    private async Task<bool> ShowConfirmDuplicatePatientDialogAsync(string existingPatientNom)
+    {
+        var dialog = new ConfirmDuplicatePatientDialog(existingPatientNom);
+        return await dialog.ShowDialog<bool>(this);
     }
 
     private async Task ShowSaveResultDialogAsync(bool isSuccess, string message)

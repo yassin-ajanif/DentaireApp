@@ -17,7 +17,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Nom).HasMaxLength(120).IsRequired();
             entity.Property(x => x.Telephone).HasMaxLength(30).IsRequired();
-            entity.HasIndex(x => new { x.Nom, x.Telephone }).IsUnique();
+            entity.HasIndex(x => x.Telephone).IsUnique();
             entity.HasMany(x => x.TreatmentInfos).WithOne().HasForeignKey(x => x.PatientId);
         });
 

@@ -1,7 +1,7 @@
 using DentaireApp.Bootstrap.Options;
 using DentaireApp.Business.Common;
-using DentaireApp.Business.Contracts.Repositories;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Repositories;
+using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Services;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using DentaireApp.DataAccess.EFCore.Repositories;
@@ -27,39 +27,39 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddBusinessServices(this IServiceCollection services)
     {
-        services.AddScoped<IPatientRegistrationService, PatientRegistrationService>();
-        services.AddScoped<IPatientRecordService, PatientRecordService>();
-        services.AddScoped<IQueueService, QueueService>();
-        services.AddScoped<IQueuePredictionService, QueuePredictionService>();
+        services.AddSingleton<IPatientRecordService, PatientRecordService>();
+        services.AddSingleton<IQueueService, QueueService>();
+        services.AddSingleton<IQueuePredictionService, QueuePredictionService>();
+        services.AddSingleton<IAppointmentService, AppointmentService>();
         return services;
     }
 
     public static IServiceCollection AddDataAccess(this IServiceCollection services, DatabaseOptions options)
     {
-        services.AddDbContext<AppDbContext>(db =>
-        {
-            if (options.Provider == DatabaseProvider.SqlServer)
+        services.AddDbContext<AppDbContext>(
+            db =>
             {
-                db.UseSqlServer(options.ConnectionString);
-            }
-            else
-            {
-                // Anchor to repo layout: .../UI.Avalonia/bin/Debug/net9.0/ -> .../src/DentaireApp.DataAccess.EFCore/dentaire.db
-                // (avoids a second empty DB next to the UI project / wrong process CWD.)
-                var sqlitePath = Path.GetFullPath(Path.Combine(
-                    AppContext.BaseDirectory,
-                    "..", "..", "..", "..",
-                    "DentaireApp.DataAccess.EFCore",
-                    "dentaire.db"));
-                db.UseSqlite($"Data Source={sqlitePath}");
-            }
-        });
+                if (options.Provider == DatabaseProvider.SqlServer)
+                {
+                    db.UseSqlServer(options.ConnectionString);
+                }
+                else
+                {
+                    var sqlitePath = Path.GetFullPath(Path.Combine(
+                        AppContext.BaseDirectory,
+                        "..", "..", "..", "..",
+                        "DentaireApp.DataAccess.EFCore",
+                        "dentaire.db"));
+                    db.UseSqlite($"Data Source={sqlitePath}");
+                }
+            },
+            contextLifetime: ServiceLifetime.Singleton,
+            optionsLifetime: ServiceLifetime.Singleton);
 
-        services.AddScoped<IPatientRepository, PatientRepository>();
-        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-        services.AddScoped<ITreatmentInfoRepository, TreatmentInfoRepository>();
-        services.AddScoped<IPatientEnqueueService, PatientEnqueueService>();
+        services.AddSingleton<IPatientRepository, PatientRepository>();
+        services.AddSingleton<IAppointmentRepository, AppointmentRepository>();
+        services.AddSingleton<ITreatmentInfoRepository, TreatmentInfoRepository>();
+        services.AddSingleton<IAppointmentEnqueuePersistence, PatientEnqueueService>();
         return services;
     }
 }
-

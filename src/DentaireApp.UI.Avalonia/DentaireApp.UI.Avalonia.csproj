@@ -31,11 +31,16 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DentaireApp.Business\DentaireApp.Business.csproj" />
     <ProjectReference Include="..\DentaireApp.Bootstrap\DentaireApp.Bootstrap.csproj" />
+    <ProjectReference Include="..\DentaireApp.DataAccess.EFCore\DentaireApp.DataAccess.EFCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

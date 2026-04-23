@@ -1,10 +1,10 @@
-using DentaireApp.Business.Contracts.Repositories;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Repositories;
+using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Appointments;
 
 namespace DentaireApp.Business.Services;
 
-public sealed class QueueService(IAppointmentRepository appointmentRepository) : IQueueService
+public class QueueService(IAppointmentRepository appointmentRepository) : IQueueService
 {
     public async Task<IReadOnlyList<Appointment>> GetQueueAsync(QueueQuery query, CancellationToken cancellationToken = default)
     {

@@ -1,6 +1,6 @@
 using DentaireApp.Business.Models.Appointments;
 
-namespace DentaireApp.Business.Contracts.Services;
+namespace DentaireApp.Business.Interfaces.Services;
 
 public sealed record QueueQuery(DateOnly Date, int Page = 1, int PageSize = 20, string? SearchTerm = null);
 
@@ -21,4 +21,3 @@ public interface IQueuePredictionService
 {
     Task<IReadOnlyList<QueuePredictionItem>> GetPredictionsAsync(QueueSnapshot queueSnapshot, CancellationToken cancellationToken = default);
 }
-

@@ -1,4 +1,4 @@
-using DentaireApp.Business.Contracts.Repositories;
+using DentaireApp.Business.Interfaces.Repositories;
 using DentaireApp.Business.Models.Patients;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +17,8 @@ public sealed class PatientRepository(AppDbContext dbContext) : IPatientReposito
             .OrderBy(x => x.Nom)
             .ToListAsync(cancellationToken);
 
-    public Task<Patient?> GetByNomAndTelephoneAsync(string nom, string telephone, CancellationToken cancellationToken = default) =>
-        dbContext.Patients.FirstOrDefaultAsync(
-            x => x.Nom == nom && x.Telephone == telephone,
-            cancellationToken);
+    public Task<Patient?> GetByTelephoneAsync(string telephone, CancellationToken cancellationToken = default) =>
+        dbContext.Patients.FirstOrDefaultAsync(x => x.Telephone == telephone, cancellationToken);
 
     public async Task AddAsync(Patient patient, CancellationToken cancellationToken = default)
     {

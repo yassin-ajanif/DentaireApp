@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DentaireApp.Business.Contracts.Repositories;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Repositories;
+using DentaireApp.Business.Interfaces.Services;
+using DentaireApp.Business.Models.Appointments;
+using DentaireApp.Business.Models.Patients;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,9 +22,12 @@ public partial class QueueViewModel : ViewModelBase
     public event Func<QueueItemViewModel?, Task>? SelectedItemChanged;
 
     public Func<Task<NewPatientInput?>>? RequestNewPatientAsync { get; set; }
+
+    /// <summary>Existing patient name; return true to enqueue anyway.</summary>
+    public Func<string, Task<bool>>? ConfirmDuplicatePatientEnqueueAsync { get; set; }
     private readonly IQueueService queueService;
     private readonly IPatientRepository patientRepository;
-    private readonly IPatientEnqueueService patientEnqueueService;
+    private readonly IAppointmentService appointmentService;
     public ObservableCollection<QueueItemViewModel> Items { get; } = [];
     private readonly ObservableCollection<QueueItemViewModel> allQueueItems = [];
     private readonly ObservableCollection<QueueItemViewModel> allPatients = [];
@@ -31,11 +36,11 @@ public partial class QueueViewModel : ViewModelBase
     public QueueViewModel(
         IQueueService queueService,
         IPatientRepository patientRepository,
-        IPatientEnqueueService patientEnqueueService)
+        IAppointmentService appointmentService)
     {
         this.queueService = queueService;
         this.patientRepository = patientRepository;
-        this.patientEnqueueService = patientEnqueueService;
+        this.appointmentService = appointmentService;
         AllPatients = new ReadOnlyObservableCollection<QueueItemViewModel>(allPatients);
     }
 
@@ -69,14 +74,32 @@ public partial class QueueViewModel : ViewModelBase
 
         try
         {
-            var result = await patientEnqueueService.RegisterAndEnqueueTodayAsync(
-                new PatientRegistrationRequest(input.Nom, input.Age, input.Adresse, input.Telephone));
+            var telephone = input.Telephone.Trim();
+            var existing = await appointmentService.FindExistingPatientByTelephoneAsync(telephone);
+            if (existing is not null)
+            {
+                if (ConfirmDuplicatePatientEnqueueAsync is null ||
+                    !await ConfirmDuplicatePatientEnqueueAsync(existing.Nom))
+                {
+                    return;
+                }
+            }
+
+            var patient = new Patient
+            {
+                Nom = input.Nom,
+                Age = input.Age,
+                Adresse = input.Adresse,
+                Telephone = input.Telephone,
+            };
+            var appointment = new Appointment { Status = AppointmentStatus.Waiting };
+            var result = await appointmentService.EnqueueAsync(patient, appointment);
 
             await ReloadAsync();
             SelectedItem = Items.FirstOrDefault(x =>
                 x.PatientId == result.Patient.Id && x.Number == result.Appointment.QueueNumber);
         }
-        catch(Exception ex)
+        catch
         {
             // Prevent UI crash from persistence errors (e.g., unique-key races); keep window alive.
         }

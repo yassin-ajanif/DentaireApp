@@ -1,13 +1,6 @@
 using DentaireApp.Business.Models.Patients;
 
-namespace DentaireApp.Business.Contracts.Services;
-
-public sealed record PatientRegistrationRequest(string Nom, int Age, string Adresse, string Telephone);
-
-public interface IPatientRegistrationService
-{
-    Task<Patient> RegisterOrResolvePatientAsync(PatientRegistrationRequest request, CancellationToken cancellationToken = default);
-}
+namespace DentaireApp.Business.Interfaces.Services;
 
 public interface IPatientRecordService
 {
@@ -15,4 +8,3 @@ public interface IPatientRecordService
     Task<IReadOnlyList<TreatmentInfo>> GetTreatmentInfosAsync(Guid patientId, CancellationToken cancellationToken = default);
     Task SaveTreatmentInfosAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default);
 }
-

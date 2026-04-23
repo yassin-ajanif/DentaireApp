@@ -1,4 +1,4 @@
-using DentaireApp.Business.Contracts.Repositories;
+using DentaireApp.Business.Interfaces.Repositories;
 using DentaireApp.Business.Models.Appointments;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;

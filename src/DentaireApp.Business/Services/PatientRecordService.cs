@@ -1,11 +1,11 @@
-using DentaireApp.Business.Contracts.Repositories;
-using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Interfaces.Repositories;
+using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Patients;
 using DentaireApp.Business.Validation;
 
 namespace DentaireApp.Business.Services;
 
-public sealed class PatientRecordService(
+public class PatientRecordService(
     IPatientRepository patientRepository,
     ITreatmentInfoRepository treatmentInfoRepository) : IPatientRecordService
 {

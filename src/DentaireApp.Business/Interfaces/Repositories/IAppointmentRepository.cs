@@ -1,6 +1,6 @@
 using DentaireApp.Business.Models.Appointments;
 
-namespace DentaireApp.Business.Contracts.Repositories;
+namespace DentaireApp.Business.Interfaces.Repositories;
 
 public interface IAppointmentRepository
 {
@@ -9,4 +9,3 @@ public interface IAppointmentRepository
     Task AddAsync(Appointment appointment, CancellationToken cancellationToken = default);
     Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken = default);
 }
-
