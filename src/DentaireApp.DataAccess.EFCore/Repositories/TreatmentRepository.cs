@@ -5,27 +5,42 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DentaireApp.DataAccess.EFCore.Repositories;
 
-public sealed class TreatmentRepository(AppDbContext dbContext) : ITreatmentRepository
+public sealed class TreatmentInfoRepository(AppDbContext dbContext) : ITreatmentInfoRepository
 {
-    public async Task<IReadOnlyList<TreatmentSheet>> GetSheetsByPatientIdAsync(Guid patientId, CancellationToken cancellationToken = default) =>
-        await dbContext.TreatmentSheets
-            .Include(x => x.Lines)
+    public async Task<IReadOnlyList<TreatmentInfo>> GetByPatientIdAsync(Guid patientId, CancellationToken cancellationToken = default) =>
+        await dbContext.TreatmentInfos
             .Where(x => x.PatientId == patientId)
-            .OrderByDescending(x => x.CreatedAt)
+            .OrderByDescending(x => x.Date)
             .ToListAsync(cancellationToken);
 
-    public Task<TreatmentSheet?> GetSheetByIdAsync(Guid sheetId, CancellationToken cancellationToken = default) =>
-        dbContext.TreatmentSheets.Include(x => x.Lines).FirstOrDefaultAsync(x => x.Id == sheetId, cancellationToken);
+    public Task<TreatmentInfo?> GetByIdAsync(Guid treatmentInfoId, CancellationToken cancellationToken = default) =>
+        dbContext.TreatmentInfos.FirstOrDefaultAsync(x => x.Id == treatmentInfoId, cancellationToken);
 
-    public async Task AddSheetAsync(TreatmentSheet sheet, CancellationToken cancellationToken = default)
+    public async Task AddAsync(TreatmentInfo treatmentInfo, CancellationToken cancellationToken = default)
     {
-        await dbContext.TreatmentSheets.AddAsync(sheet, cancellationToken);
+        await dbContext.TreatmentInfos.AddAsync(treatmentInfo, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task SaveSheetAsync(TreatmentSheet sheet, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(TreatmentInfo treatmentInfo, CancellationToken cancellationToken = default)
     {
-        dbContext.TreatmentSheets.Update(sheet);
+        dbContext.TreatmentInfos.Update(treatmentInfo);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ReplaceByPatientIdAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default)
+    {
+        var existing = await dbContext.TreatmentInfos
+            .Where(x => x.PatientId == patientId)
+            .ToListAsync(cancellationToken);
+        dbContext.TreatmentInfos.RemoveRange(existing);
+
+        foreach (var info in treatmentInfos)
+        {
+            info.PatientId = patientId;
+        }
+
+        await dbContext.TreatmentInfos.AddRangeAsync(treatmentInfos, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

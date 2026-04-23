@@ -1,6 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DentaireApp.Business.Contracts.Repositories;
+using DentaireApp.Business.Contracts.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,35 +17,41 @@ public partial class QueueViewModel : ViewModelBase
 
     [ObservableProperty]
     private QueueItemViewModel? selectedItem;
+    public event Func<QueueItemViewModel?, Task>? SelectedItemChanged;
 
     public Func<Task<NewPatientInput?>>? RequestNewPatientAsync { get; set; }
+    private readonly IQueueService queueService;
+    private readonly IPatientRepository patientRepository;
+    private readonly IPatientEnqueueService patientEnqueueService;
+    public ObservableCollection<QueueItemViewModel> Items { get; } = [];
+    private readonly ObservableCollection<QueueItemViewModel> allQueueItems = [];
+    private readonly ObservableCollection<QueueItemViewModel> allPatients = [];
+    public ReadOnlyObservableCollection<QueueItemViewModel> AllPatients { get; }
 
-    public ObservableCollection<QueueItemViewModel> Items { get; } =
-    [
-        new QueueItemViewModel(21, "ahmed ajanif", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(22, "ahmed ajanif", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(23, "yassin ajanif", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(24, "karim benali", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(25, "fatima el amrani", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(26, "omar idrissi", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(27, "sanae mouline", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(28, "mehdi chraibi", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(29, "nadia zerhouni", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(30, "youssef tazi", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(31, "houda filali", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(32, "rachid bensaid", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(33, "imane loukili", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(34, "anass harouch", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(35, "salma benjelloun", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(36, "hamza ouazzani", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(37, "laila sekkat", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(38, "bilal kettani", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(39, "khadija ramdani", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(40, "amine fassi", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(41, "zineb alaoui", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(42, "tarik benkirane", "15:30 - 16:15", 0, string.Empty, string.Empty),
-        new QueueItemViewModel(43, "hanae mazouz", "15:30 - 16:15", 0, string.Empty, string.Empty),
-    ];
+    public QueueViewModel(
+        IQueueService queueService,
+        IPatientRepository patientRepository,
+        IPatientEnqueueService patientEnqueueService)
+    {
+        this.queueService = queueService;
+        this.patientRepository = patientRepository;
+        this.patientEnqueueService = patientEnqueueService;
+        AllPatients = new ReadOnlyObservableCollection<QueueItemViewModel>(allPatients);
+    }
+
+    partial void OnSearchTermChanged(string value) => ApplySearchFilter();
+    partial void OnSelectedItemChanged(QueueItemViewModel? value)
+    {
+        if (SelectedItemChanged is not null)
+        {
+            _ = SelectedItemChanged.Invoke(value);
+        }
+    }
+
+    public async Task InitializeAsync()
+    {
+        await ReloadAsync();
+    }
 
     [RelayCommand]
     private async Task NouveauNumero()
@@ -58,25 +67,37 @@ public partial class QueueViewModel : ViewModelBase
             return;
         }
 
-        var nextNumber = Items.Count == 0 ? 1 : Items.Max(x => x.Number) + 1;
-        var newItem = new QueueItemViewModel(
-            nextNumber,
-            input.Nom.Trim(),
-            "Pending doctor arrival",
-            input.Age,
-            input.Adresse,
-            input.Telephone);
-        Items.Add(newItem);
-        SelectedItem = newItem;
+        try
+        {
+            var result = await patientEnqueueService.RegisterAndEnqueueTodayAsync(
+                new PatientRegistrationRequest(input.Nom, input.Age, input.Adresse, input.Telephone));
+
+            await ReloadAsync();
+            SelectedItem = Items.FirstOrDefault(x =>
+                x.PatientId == result.Patient.Id && x.Number == result.Appointment.QueueNumber);
+        }
+        catch(Exception ex)
+        {
+            // Prevent UI crash from persistence errors (e.g., unique-key races); keep window alive.
+        }
     }
 
-    public void UpdatePatientCredentials(QueueItemViewModel item, NewPatientInput input)
+    public async Task UpdatePatientCredentialsAsync(QueueItemViewModel item, NewPatientInput input)
     {
-        item.Nom = input.Nom.Trim();
-        item.Age = input.Age;
-        item.Adresse = input.Adresse.Trim();
-        item.Telephone = input.Telephone.Trim();
-        SelectedItem = item;
+        var patient = await patientRepository.GetByIdAsync(item.PatientId);
+        if (patient is null)
+        {
+            return;
+        }
+
+        patient.Nom = input.Nom.Trim();
+        patient.Age = input.Age;
+        patient.Adresse = input.Adresse.Trim();
+        patient.Telephone = input.Telephone.Trim();
+        await patientRepository.UpdateAsync(patient);
+
+        await ReloadAsync();
+        SelectedItem = Items.FirstOrDefault(x => x.PatientId == patient.Id && x.Number == item.Number);
     }
 
     [RelayCommand]
@@ -104,10 +125,72 @@ public partial class QueueViewModel : ViewModelBase
         var previousIndex = Math.Max(currentIndex - 1, 0);
         SelectedItem = Items[previousIndex];
     }
+
+    private async Task ReloadAsync()
+    {
+        var patients = await patientRepository.GetAllAsync();
+        var patientsById = patients.ToDictionary(p => p.Id);
+
+        var queue = await queueService.GetQueueAsync(new QueueQuery(DateOnly.FromDateTime(DateTime.Now), 1, 500, null));
+
+        allQueueItems.Clear();
+        foreach (var appointment in queue)
+        {
+            if (!patientsById.TryGetValue(appointment.PatientId, out var patient))
+            {
+                continue;
+            }
+
+            allQueueItems.Add(new QueueItemViewModel(
+                appointment.PatientId,
+                appointment.QueueNumber,
+                patient.Nom,
+                "15:30 - 16:15",
+                patient.Age,
+                patient.Adresse,
+                patient.Telephone));
+        }
+
+        allPatients.Clear();
+        var index = 1;
+        foreach (var patient in patients)
+        {
+            allPatients.Add(new QueueItemViewModel(
+                patient.Id,
+                index++,
+                patient.Nom,
+                string.Empty,
+                patient.Age,
+                patient.Adresse,
+                patient.Telephone));
+        }
+
+        ApplySearchFilter();
+    }
+
+    private void ApplySearchFilter()
+    {
+        var term = SearchTerm?.Trim();
+        IEnumerable<QueueItemViewModel> filtered = string.IsNullOrWhiteSpace(term)
+            ? allQueueItems
+            : allQueueItems.Where(x => x.Nom.Contains(term, StringComparison.OrdinalIgnoreCase));
+
+        Items.Clear();
+        foreach (var item in filtered)
+        {
+            Items.Add(item);
+        }
+
+        if (SelectedItem is not null && !Items.Contains(SelectedItem))
+        {
+            SelectedItem = Items.FirstOrDefault();
+        }
+    }
 }
 
 public sealed partial class QueueItemViewModel : ObservableObject
 {
+    public Guid PatientId { get; }
     public int Number { get; }
 
     [ObservableProperty]
@@ -125,8 +208,9 @@ public sealed partial class QueueItemViewModel : ObservableObject
     [ObservableProperty]
     private string telephone;
 
-    public QueueItemViewModel(int number, string nom, string predictedInterval, int age, string adresse, string telephone)
+    public QueueItemViewModel(Guid patientId, int number, string nom, string predictedInterval, int age, string adresse, string telephone)
     {
+        PatientId = patientId;
         Number = number;
         this.nom = nom;
         this.predictedInterval = predictedInterval;

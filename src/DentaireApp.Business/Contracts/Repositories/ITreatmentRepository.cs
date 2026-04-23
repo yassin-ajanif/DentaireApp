@@ -2,11 +2,12 @@ using DentaireApp.Business.Models.Patients;
 
 namespace DentaireApp.Business.Contracts.Repositories;
 
-public interface ITreatmentRepository
+public interface ITreatmentInfoRepository
 {
-    Task<IReadOnlyList<TreatmentSheet>> GetSheetsByPatientIdAsync(Guid patientId, CancellationToken cancellationToken = default);
-    Task<TreatmentSheet?> GetSheetByIdAsync(Guid sheetId, CancellationToken cancellationToken = default);
-    Task AddSheetAsync(TreatmentSheet sheet, CancellationToken cancellationToken = default);
-    Task SaveSheetAsync(TreatmentSheet sheet, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TreatmentInfo>> GetByPatientIdAsync(Guid patientId, CancellationToken cancellationToken = default);
+    Task<TreatmentInfo?> GetByIdAsync(Guid treatmentInfoId, CancellationToken cancellationToken = default);
+    Task AddAsync(TreatmentInfo treatmentInfo, CancellationToken cancellationToken = default);
+    Task SaveAsync(TreatmentInfo treatmentInfo, CancellationToken cancellationToken = default);
+    Task ReplaceByPatientIdAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default);
 }
 

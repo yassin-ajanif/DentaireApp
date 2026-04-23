@@ -1,7 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DentaireApp.Business.Contracts.Repositories;
+using DentaireApp.Business.Contracts.Services;
+using DentaireApp.Business.Models.Patients;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +12,10 @@ namespace DentaireApp.UI.Avalonia.ViewModels;
 
 public partial class PatientRecordViewModel : ViewModelBase
 {
+    private readonly IPatientRepository patientRepository;
+    private readonly IPatientRecordService patientRecordService;
+    private Guid? currentPatientId;
+
     [ObservableProperty]
     private string nom = string.Empty;
 
@@ -26,14 +33,27 @@ public partial class PatientRecordViewModel : ViewModelBase
 
     public Func<bool, string, Task>? ShowSaveResultAsync { get; set; }
 
-    public List<TreatmentLineViewModel> Lines { get; } =
-    [
-        new(DateTime.Today, "this is a test data", 100m, 60m, 40m),
-    ];
+    public ObservableCollection<TreatmentInfoViewModel> TreatmentInfos { get; } = [];
+
+    public PatientRecordViewModel(IPatientRepository patientRepository, IPatientRecordService patientRecordService)
+    {
+        this.patientRepository = patientRepository;
+        this.patientRecordService = patientRecordService;
+    }
 
     [RelayCommand]
     private async Task Enregistrer()
     {
+        if (currentPatientId is null)
+        {
+            SaveMessage = "Aucun patient selectionne.";
+            if (ShowSaveResultAsync is not null)
+            {
+                await ShowSaveResultAsync(false, SaveMessage);
+            }
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(Nom) || string.IsNullOrWhiteSpace(Telephone))
         {
             SaveMessage = "Nom et Telephone sont obligatoires.";
@@ -54,15 +74,35 @@ public partial class PatientRecordViewModel : ViewModelBase
             return;
         }
 
-        if (Lines.Any(line => line.PrixConven != line.Recu + line.ARecevoir))
+        var patient = await patientRepository.GetByIdAsync(currentPatientId.Value);
+        if (patient is null)
         {
-            SaveMessage = "Echec: Prix Conven doit etre egal a Recu + A Recevoir.";
+            SaveMessage = "Patient introuvable.";
             if (ShowSaveResultAsync is not null)
             {
                 await ShowSaveResultAsync(false, SaveMessage);
             }
             return;
         }
+
+        patient.Nom = Nom.Trim();
+        patient.Age = Age;
+        patient.Telephone = Telephone.Trim();
+        patient.Adresse = Adresse.Trim();
+        await patientRepository.UpdateAsync(patient);
+
+        var infos = TreatmentInfos.Select(line => new TreatmentInfo
+        {
+            Id = line.Id,
+            PatientId = currentPatientId.Value,
+            Date = line.Date,
+            NatureOperation = line.NatureOperation.Trim(),
+            PrixConven = line.PrixConven,
+            Recu = line.Recu,
+            ARecevoir = line.ARecevoir,
+        }).ToList();
+
+        await patientRecordService.SaveTreatmentInfosAsync(currentPatientId.Value, infos);
 
         SaveMessage = "Enregistrement effectue.";
         if (ShowSaveResultAsync is not null)
@@ -78,17 +118,83 @@ public partial class PatientRecordViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void AddSheet()
+    private void AddTreatmentInfo()
     {
-        Lines.Add(new TreatmentLineViewModel(DateTime.Today, string.Empty, 0m, 0m, 0m));
-        OnPropertyChanged(nameof(Lines));
+        TreatmentInfos.Add(new TreatmentInfoViewModel
+        {
+            Id = Guid.NewGuid(),
+            Date = DateTime.Today,
+            NatureOperation = string.Empty,
+            PrixConven = 0m,
+            Recu = 0m,
+            ARecevoir = 0m,
+        });
+    }
+
+    public async Task LoadForPatientAsync(Guid? patientId)
+    {
+        currentPatientId = patientId;
+
+        TreatmentInfos.Clear();
+        SaveMessage = string.Empty;
+
+        if (patientId is null)
+        {
+            Nom = string.Empty;
+            Age = 0;
+            Telephone = string.Empty;
+            Adresse = string.Empty;
+            return;
+        }
+
+        var patient = await patientRecordService.GetPatientRecordAsync(patientId.Value);
+        if (patient is null)
+        {
+            Nom = string.Empty;
+            Age = 0;
+            Telephone = string.Empty;
+            Adresse = string.Empty;
+            return;
+        }
+
+        Nom = patient.Nom;
+        Age = patient.Age;
+        Telephone = patient.Telephone;
+        Adresse = patient.Adresse;
+
+        var infos = await patientRecordService.GetTreatmentInfosAsync(patientId.Value);
+        foreach (var info in infos.OrderBy(x => x.Date))
+        {
+            TreatmentInfos.Add(new TreatmentInfoViewModel
+            {
+                Id = info.Id,
+                Date = info.Date,
+                NatureOperation = info.NatureOperation,
+                PrixConven = info.PrixConven,
+                Recu = info.Recu,
+                ARecevoir = info.ARecevoir,
+            });
+        }
     }
 }
 
-public sealed record TreatmentLineViewModel(
-    DateTime Date,
-    string NatureOperation,
-    decimal PrixConven,
-    decimal Recu,
-    decimal ARecevoir);
+public sealed partial class TreatmentInfoViewModel : ObservableObject
+{
+    public Guid Id { get; set; }
+
+    [ObservableProperty]
+    private DateTime date;
+
+    [ObservableProperty]
+    private string natureOperation = string.Empty;
+
+    [ObservableProperty]
+    private decimal prixConven;
+
+    [ObservableProperty]
+    private decimal recu;
+
+    [ObservableProperty]
+    private decimal aRecevoir;
+}
 

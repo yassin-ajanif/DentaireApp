@@ -20,6 +20,7 @@ public partial class MainWindow : Window
         {
             vm.Queue.RequestNewPatientAsync = ShowNewPatientDialogAsync;
             vm.PatientRecord.ShowSaveResultAsync = ShowSaveResultDialogAsync;
+            _ = vm.InitializeAsync();
         }
     }
 
@@ -50,7 +51,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        vm.Queue.UpdatePatientCredentials(item, updated);
+        await vm.Queue.UpdatePatientCredentialsAsync(item, updated);
     }
 
     private void OnQueueItemPointerPressed(object? sender, PointerPressedEventArgs e)

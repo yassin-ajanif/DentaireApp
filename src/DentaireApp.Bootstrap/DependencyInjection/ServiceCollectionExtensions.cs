@@ -5,9 +5,11 @@ using DentaireApp.Business.Contracts.Services;
 using DentaireApp.Business.Services;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using DentaireApp.DataAccess.EFCore.Repositories;
+using DentaireApp.DataAccess.EFCore.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace DentaireApp.Bootstrap.DependencyInjection;
 
@@ -42,14 +44,21 @@ public static class ServiceCollectionExtensions
             }
             else
             {
-                db.UseSqlite(options.ConnectionString);
+                // Anchor to repo layout: .../UI.Avalonia/bin/Debug/net9.0/ -> .../src/DentaireApp.DataAccess.EFCore/dentaire.db
+                // (avoids a second empty DB next to the UI project / wrong process CWD.)
+                var sqlitePath = Path.GetFullPath(Path.Combine(
+                    AppContext.BaseDirectory,
+                    "..", "..", "..", "..",
+                    "DentaireApp.DataAccess.EFCore",
+                    "dentaire.db"));
+                db.UseSqlite($"Data Source={sqlitePath}");
             }
         });
 
         services.AddScoped<IPatientRepository, PatientRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-        services.AddScoped<ITreatmentRepository, TreatmentRepository>();
-        services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+        services.AddScoped<ITreatmentInfoRepository, TreatmentInfoRepository>();
+        services.AddScoped<IPatientEnqueueService, PatientEnqueueService>();
         return services;
     }
 }

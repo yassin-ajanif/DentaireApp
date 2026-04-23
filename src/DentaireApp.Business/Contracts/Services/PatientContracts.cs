@@ -12,8 +12,7 @@ public interface IPatientRegistrationService
 public interface IPatientRecordService
 {
     Task<Patient?> GetPatientRecordAsync(Guid patientId, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<TreatmentSheet>> GetTreatmentSheetsAsync(Guid patientId, CancellationToken cancellationToken = default);
-    Task<TreatmentSheet> CreateTreatmentSheetAsync(Guid patientId, CancellationToken cancellationToken = default);
-    Task SaveTreatmentSheetAsync(TreatmentSheet sheet, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TreatmentInfo>> GetTreatmentInfosAsync(Guid patientId, CancellationToken cancellationToken = default);
+    Task SaveTreatmentInfosAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default);
 }
 

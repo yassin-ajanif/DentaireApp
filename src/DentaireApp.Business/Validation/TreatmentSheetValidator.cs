@@ -2,16 +2,13 @@ using DentaireApp.Business.Models.Patients;
 
 namespace DentaireApp.Business.Validation;
 
-public static class TreatmentSheetValidator
+public static class TreatmentInfoValidator
 {
-    public static void Validate(TreatmentSheet sheet)
+    public static void Validate(TreatmentInfo treatmentInfo)
     {
-        foreach (var line in sheet.Lines)
+        if (treatmentInfo.PrixConven != treatmentInfo.Recu + treatmentInfo.ARecevoir)
         {
-            if (line.PrixConven != line.Recu + line.ARecevoir)
-            {
-                throw new InvalidOperationException("Prix Conven must equal Recu + A Recevoir.");
-            }
+            throw new InvalidOperationException("Prix Conven must equal Recu + A Recevoir.");
         }
     }
 }

@@ -7,6 +7,6 @@ public sealed class Patient
     public int Age { get; set; }
     public string Telephone { get; set; } = string.Empty;
     public string Adresse { get; set; } = string.Empty;
-    public List<TreatmentSheet> TreatmentSheets { get; set; } = [];
+    public List<TreatmentInfo> TreatmentInfos { get; set; } = [];
 }
 

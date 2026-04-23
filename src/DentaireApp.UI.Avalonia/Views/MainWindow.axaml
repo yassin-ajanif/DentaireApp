@@ -110,7 +110,7 @@
                                     HorizontalAlignment="Stretch"
                                     MaxWidth="540">
                                 <TextBox Classes="queue-search"
-                                         Watermark="Search patient"
+                                         Watermark="Rechercher un patient"
                                          Text="{Binding SearchTerm}"
                                          MinHeight="0"
                                          Height="34"
@@ -285,7 +285,7 @@
                         </Grid>
                     </Border>
 
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Lines}" AutoGenerateColumns="False">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding TreatmentInfos}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Dates" Binding="{Binding Date}"/>
                             <DataGridTextColumn Header="Natures des Opérations" Binding="{Binding NatureOperation}"/>
@@ -298,9 +298,31 @@
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                         <Button Content="Annuler" Command="{Binding AnnulerCommand}" />
                         <Button Content="Enregistrer" Command="{Binding EnregistrerCommand}" />
-                        <Button Content="+" Command="{Binding AddSheetCommand}" />
+                        <Button Content="+" Command="{Binding AddTreatmentInfoCommand}" />
                     </StackPanel>
                     <TextBlock Grid.Row="3" Text="{Binding SaveMessage}" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Patient list">
+                <Grid Margin="12"
+                      ColumnDefinitions="400,*"
+                      ColumnSpacing="16">
+                    <!-- Left column intentionally empty so logo remains visible -->
+                    <Border Grid.Column="0"
+                            Background="Transparent"
+                            IsHitTestVisible="False" />
+                    <DataGrid Grid.Column="1"
+                              ItemsSource="{Binding PatientList}"
+                              AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="N°" Binding="{Binding Number}" />
+                            <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" />
+                            <DataGridTextColumn Header="Age" Binding="{Binding Age}" />
+                            <DataGridTextColumn Header="Téléphone" Binding="{Binding Telephone}" />
+                            <DataGridTextColumn Header="Adresse" Binding="{Binding Adresse}" />
+                            <DataGridTextColumn Header="Plage estimée" Binding="{Binding PredictedInterval}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>

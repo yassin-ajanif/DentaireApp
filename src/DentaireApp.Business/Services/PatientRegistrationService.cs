@@ -8,7 +8,10 @@ public sealed class PatientRegistrationService(IPatientRepository patientReposit
 {
     public async Task<Patient> RegisterOrResolvePatientAsync(PatientRegistrationRequest request, CancellationToken cancellationToken = default)
     {
-        var existing = await patientRepository.GetByNomAndTelephoneAsync(request.Nom, request.Telephone, cancellationToken);
+        var nom = request.Nom.Trim();
+        var telephone = request.Telephone.Trim();
+
+        var existing = await patientRepository.GetByNomAndTelephoneAsync(nom, telephone, cancellationToken);
         if (existing is not null)
         {
             return existing;
@@ -16,10 +19,10 @@ public sealed class PatientRegistrationService(IPatientRepository patientReposit
 
         var patient = new Patient
         {
-            Nom = request.Nom.Trim(),
+            Nom = nom,
             Age = request.Age,
             Adresse = request.Adresse.Trim(),
-            Telephone = request.Telephone.Trim(),
+            Telephone = telephone,
         };
 
         await patientRepository.AddAsync(patient, cancellationToken);

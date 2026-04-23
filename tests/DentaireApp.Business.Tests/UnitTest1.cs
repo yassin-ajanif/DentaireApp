@@ -8,19 +8,13 @@ public class UnitTest1
     [Fact]
     public void Validate_Throws_WhenFinancialEquationIsInvalid()
     {
-        var sheet = new TreatmentSheet
+        var info = new TreatmentInfo
         {
-            Lines =
-            [
-                new TreatmentLine
-                {
-                    PrixConven = 100m,
-                    Recu = 60m,
-                    ARecevoir = 30m,
-                },
-            ],
+            PrixConven = 100m,
+            Recu = 60m,
+            ARecevoir = 30m,
         };
 
-        Assert.Throws<InvalidOperationException>(() => TreatmentSheetValidator.Validate(sheet));
+        Assert.Throws<InvalidOperationException>(() => TreatmentInfoValidator.Validate(info));
     }
 }
