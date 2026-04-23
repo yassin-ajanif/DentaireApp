@@ -1,0 +1,306 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DentaireApp.UI.Avalonia.ViewModels"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        x:Class="DentaireApp.UI.Avalonia.Views.PatientRecordDialog"
+        x:DataType="vm:PatientRecordViewModel"
+        Title="Dossier patient"
+        MinWidth="960"
+        MinHeight="520"
+        Width="1040"
+        Height="680"
+        CanResize="True"
+        FontFamily="Consolas, 'Courier New', monospace"
+        Background="#E4EBE0">
+
+  <Window.Styles>
+    <Style Selector="TextBlock.dossier-label">
+      <Setter Property="Foreground" Value="#2C4483" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox.dossier-field">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Gray}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="CaretBrush" Value="{DynamicResource Color.Text.Gray}" />
+      <Setter Property="SelectionBrush" Value="#B8C9E8" />
+    </Style>
+    <Style Selector="TextBox.dossier-field /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.dossier-secondary">
+      <Setter Property="Background" Value="#9CA3AF" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="22,10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.dossier-secondary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#8B95A3" />
+    </Style>
+    <Style Selector="Button.dossier-primary">
+      <Setter Property="Background" Value="#2C4483" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="22,10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.dossier-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#243A6E" />
+    </Style>
+    <Style Selector="Button.dossier-add">
+      <Setter Property="Background" Value="#2C4483" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="Width" Value="40" />
+      <Setter Property="Height" Value="40" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="FontSize" Value="22" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.dossier-add:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#243A6E" />
+    </Style>
+    <Style Selector="Button.dossier-fermer">
+      <Setter Property="Background" Value="#DCE5DC" />
+      <Setter Property="Foreground" Value="#2C4483" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="20,10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="ClipToBounds" Value="True" />
+      <Setter Property="GridLinesVisibility" Value="All" />
+      <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
+      <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
+    </Style>
+    <!-- Clip grid chrome to rounded rect; no stroke on the grid (frame is the two wrapping Borders). -->
+    <Style Selector="DataGrid.dossier-grid /template/ Border#DataGridBorder">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="ClipToBounds" Value="True" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridColumnHeader">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#2C4483" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Padding" Value="10,12" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridColumnHeader TextBlock">
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridCell">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
+      <Setter Property="Padding" Value="8,6" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridCell TextBlock">
+      <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridRow">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridRow:pointerover">
+      <Setter Property="Background" Value="#E6EBE4" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridRow:selected">
+      <Setter Property="Background" Value="#DCE8DC" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid DataGridRow:selected:pointerover">
+      <Setter Property="Background" Value="#D4DFD2" />
+    </Style>
+    <Style Selector="DataGrid.dossier-grid TextBox">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
+      <Setter Property="BorderBrush" Value="#9AAC96" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CaretBrush" Value="{DynamicResource Color.Text.Gray}" />
+      <Setter Property="SelectionBrush" Value="#B8C9E8" />
+      <Setter Property="Padding" Value="6,4" />
+    </Style>
+  </Window.Styles>
+
+  <Panel>
+    <!-- Same pattern as MainWindow background.svg: fills the panel and stretches with resize. -->
+    <svg:Svg Path="/Assets/PatientListInfoBackground.svg"
+             Stretch="Fill"
+             Opacity="0.92"
+             IsHitTestVisible="False" />
+
+    <Grid ColumnDefinitions="300,*"
+          RowDefinitions="*,Auto"
+          Margin="24,20,24,16"
+          ColumnSpacing="20"
+          RowSpacing="16"
+          ClipToBounds="False">
+      <Border Grid.Row="0"
+              Grid.RowSpan="2"
+              Grid.Column="0"
+              
+              CornerRadius="14"
+              Padding="12"
+              ClipToBounds="True"
+              BoxShadow="0 2 10 0 #28000012">
+        <svg:Svg Path="/Assets/theth structure.svg"
+                 Stretch="Uniform"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 IsHitTestVisible="False" />
+      </Border>
+
+      <ScrollViewer Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalScrollBarVisibility="Disabled"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16"
+                    HorizontalAlignment="Stretch">
+          <Border Background="#D5DDD3"
+                  CornerRadius="14"
+                  Padding="16,10"
+                  BoxShadow="0 2 10 0 #28000018">
+            <StackPanel Spacing="8">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,Auto"
+                    RowDefinitions="Auto,Auto,Auto"
+                    RowSpacing="4"
+                    ColumnSpacing="14">
+                <TextBlock Grid.Row="0" Grid.Column="0" Classes="dossier-label" Text="Nom" />
+                <TextBox Grid.Row="0"
+                         Grid.Column="1"
+                         Grid.ColumnSpan="3"
+                         Classes="dossier-field"
+                         Text="{Binding Nom}" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Classes="dossier-label" Text="Age" TextDecorations="Underline" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="1"
+                         Classes="dossier-field"
+                         Text="{Binding Age}" />
+                <TextBlock Grid.Row="1" Grid.Column="2" Classes="dossier-label" Text="Telephone" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="3"
+                         Classes="dossier-field"
+                         Text="{Binding Telephone}" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Classes="dossier-label" Text="Adresse" />
+                <TextBox Grid.Row="2"
+                         Grid.Column="1"
+                         Grid.ColumnSpan="3"
+                         Classes="dossier-field"
+                         Text="{Binding Adresse}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <StackPanel Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      Spacing="10">
+            <Button Classes="dossier-secondary"
+                    Content="Annuler"
+                    Command="{Binding AnnulerCommand}" />
+            <Button Classes="dossier-primary"
+                    Content="Enregistrer"
+                    Command="{Binding EnregistrerCommand}" />
+          </StackPanel>
+
+          <!-- Double frame: outer + inner strokes; Padding is the gutter — keep outer Background transparent so the gap shows through. -->
+          <Border CornerRadius="14"
+                  Background="Transparent"
+                  BorderBrush="{DynamicResource Brush.Stroke.Gray}"
+                  BorderThickness="1"
+                  Padding="5"
+                  ClipToBounds="True"
+                  HorizontalAlignment="Stretch"
+                  UseLayoutRounding="True">
+            <Border CornerRadius="9"
+                    Background="#E2E9E0"
+                    BorderBrush="{DynamicResource Brush.Stroke.Gray}"
+                    BorderThickness="1"
+                    Padding="0"
+                    ClipToBounds="True"
+                    HorizontalAlignment="Stretch">
+              <!-- Stretch so the grid gets a real width inside the double frame; all columns use * weights so no filler column. -->
+              <!-- MinHeight/MaxHeight: DataGrid in a vertical StackPanel gets unbounded height and often paints no rows until layout changes (e.g. Avalonia #19236). -->
+              <DataGrid Classes="dossier-grid"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        
+                        MaxHeight="520"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled"
+                        ItemsSource="{Binding TreatmentInfos}"
+                        AutoGenerateColumns="False"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        CanUserSortColumns="True">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="DATES"
+                                    Binding="{Binding Date}"
+                                    Width="3*"
+                                    MinWidth="200" />
+                <DataGridTextColumn Header="Natures des Opérations"
+                                    Binding="{Binding NatureOperation}"
+                                    Width="12*"
+                                    MinWidth="160" />
+                <DataGridTextColumn Header="Prix Conven"
+                                    Binding="{Binding PrixConven}"
+                                    Width="4*"
+                                    MinWidth="100" />
+                <DataGridTextColumn Header="Reçu"
+                                    Binding="{Binding Recu}"
+                                    Width="3*"
+                                    MinWidth="84" />
+                <DataGridTextColumn Header="A Recevoir"
+                                    Binding="{Binding ARecevoir}"
+                                    Width="4*"
+                                    MinWidth="100" />
+              </DataGrid.Columns>
+              </DataGrid>
+            </Border>
+          </Border>
+
+          <StackPanel HorizontalAlignment="Center" Margin="0,-8,0,0">
+            <Button Classes="dossier-add"
+                    Content="+"
+                    Command="{Binding AddTreatmentInfoCommand}" />
+          </StackPanel>
+
+          <TextBlock Text="{Binding SaveMessage}"
+                     Foreground="#2C4483"
+                     TextWrapping="Wrap"
+                     FontSize="13" />
+        </StackPanel>
+      </ScrollViewer>
+
+      <!--<Button Grid.Row="1"
+              Grid.Column="1"
+              Classes="dossier-fermer"
+              HorizontalAlignment="Right"
+              Width="110"
+              Content="Fermer"
+              Click="OnFermerClick" />-->
+    </Grid>
+  </Panel>
+</Window>

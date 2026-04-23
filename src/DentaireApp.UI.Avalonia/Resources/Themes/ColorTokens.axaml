@@ -4,15 +4,24 @@
   <Color x:Key="ColorRaw.PrimaryGreen">#7A9E7E</Color>
   <Color x:Key="ColorRaw.SurfaceFaintGreen">#E7EDE3</Color>
   <Color x:Key="ColorRaw.NeutralGray">#D9D9D9</Color>
+  <!-- Neutral UI frame (tables, cards) — darker than NeutralGray fill so edges read on pale sage -->
+  <Color x:Key="ColorRaw.GrayStroke">#B0B0B0</Color>
+  <!-- Body / field text on light surfaces (readable neutral, aligned with NeutralGray family) -->
+  <Color x:Key="ColorRaw.TextGray">#5C6368</Color>
+  <!-- Softer gray for table cells / low-emphasis data on pale green backgrounds -->
+  <Color x:Key="ColorRaw.TextGrayMuted">#949DA3</Color>
 
   <SolidColorBrush x:Key="Color.Background.App" Color="{StaticResource ColorRaw.SurfaceFaintGreen}" />
   <SolidColorBrush x:Key="Color.Background.Card" Color="{StaticResource ColorRaw.NeutralGray}" Opacity="0.3" />
   <!-- Control outlines (inputs, grids) — primary green #7A9E7E -->
   <SolidColorBrush x:Key="Brush.Stroke.System" Color="{StaticResource ColorRaw.PrimaryGreen}" />
   <SolidColorBrush x:Key="Brush.Stroke.Disabled" Color="{StaticResource ColorRaw.NeutralGray}" />
+  <SolidColorBrush x:Key="Brush.Stroke.Gray" Color="{StaticResource ColorRaw.GrayStroke}" />
   <SolidColorBrush x:Key="Color.Border.Default" Color="{StaticResource ColorRaw.PrimaryGreen}" />
   <SolidColorBrush x:Key="Color.Text.Primary" Color="{StaticResource ColorRaw.PrimaryBlue}" />
   <SolidColorBrush x:Key="Color.Text.Secondary" Color="{StaticResource ColorRaw.PrimaryGreen}" />
+  <SolidColorBrush x:Key="Color.Text.Gray" Color="{StaticResource ColorRaw.TextGray}" />
+  <SolidColorBrush x:Key="Color.Text.GrayMuted" Color="{StaticResource ColorRaw.TextGrayMuted}" />
   <SolidColorBrush x:Key="Color.Action.Primary" Color="{StaticResource ColorRaw.PrimaryBlue}" />
   <SolidColorBrush x:Key="Color.Accent.Success" Color="{StaticResource ColorRaw.PrimaryGreen}" />
 </ResourceDictionary>

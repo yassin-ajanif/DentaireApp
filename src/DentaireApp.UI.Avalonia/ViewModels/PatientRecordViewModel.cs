@@ -33,6 +33,9 @@ public partial class PatientRecordViewModel : ViewModelBase
 
     public Func<bool, string, Task>? ShowSaveResultAsync { get; set; }
 
+    /// <summary>Same effect as closing the dossier window (Fermer); set by the patient record window code-behind.</summary>
+    public Action? CloseDialog { get; set; }
+
     public ObservableCollection<TreatmentInfoViewModel> TreatmentInfos { get; } = [];
 
     public PatientRecordViewModel(IPatientRepository patientRepository, IPatientRecordService patientRecordService)
@@ -109,6 +112,8 @@ public partial class PatientRecordViewModel : ViewModelBase
         {
             await ShowSaveResultAsync(true, SaveMessage);
         }
+
+        CloseDialog?.Invoke();
     }
 
     [RelayCommand]

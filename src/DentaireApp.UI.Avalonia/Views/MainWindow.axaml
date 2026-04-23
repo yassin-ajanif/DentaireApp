@@ -142,7 +142,7 @@
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Traiter patient" />
-                                <MenuItem Header="Dossier patient" />
+                                <MenuItem Header="Dossier patient" Click="OnQueueDossierPatientClick" />
                                 <MenuItem Header="Modifier informations patient" Click="OnEditPatientCredentialsClick" />
                             </ContextMenu>
                         </ListBox.ContextMenu>
@@ -269,40 +269,6 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Dossier patient">
-                <Grid DataContext="{Binding PatientRecord}" RowDefinitions="Auto,*,Auto,Auto" Margin="0,8,0,0" RowSpacing="8">
-                    <Border Padding="12">
-                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
-                            <TextBlock Text="Nom *" />
-                            <TextBox Grid.Column="1" Text="{Binding Nom}" />
-                            <TextBlock Grid.Column="2" Text="Telephone *" />
-                            <TextBox Grid.Column="3" Text="{Binding Telephone}" />
-
-                            <TextBlock Grid.Row="1" Text="Age" />
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Age}" />
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Adresse" />
-                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Adresse}" />
-                        </Grid>
-                    </Border>
-
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding TreatmentInfos}" AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Dates" Binding="{Binding Date}"/>
-                            <DataGridTextColumn Header="Natures des Opérations" Binding="{Binding NatureOperation}"/>
-                            <DataGridTextColumn Header="Prix Conven" Binding="{Binding PrixConven}"/>
-                            <DataGridTextColumn Header="Reçu" Binding="{Binding Recu}"/>
-                            <DataGridTextColumn Header="A Recevoir" Binding="{Binding ARecevoir}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                        <Button Content="Annuler" Command="{Binding AnnulerCommand}" />
-                        <Button Content="Enregistrer" Command="{Binding EnregistrerCommand}" />
-                        <Button Content="+" Command="{Binding AddTreatmentInfoCommand}" />
-                    </StackPanel>
-                    <TextBlock Grid.Row="3" Text="{Binding SaveMessage}" />
-                </Grid>
-            </TabItem>
             <TabItem Header="Patient list">
                 <Grid Margin="12"
                       ColumnDefinitions="400,*"
@@ -311,9 +277,16 @@
                     <Border Grid.Column="0"
                             Background="Transparent"
                             IsHitTestVisible="False" />
-                    <DataGrid Grid.Column="1"
+                    <DataGrid x:Name="PatientListDataGrid"
+                              Grid.Column="1"
                               ItemsSource="{Binding PatientList}"
-                              AutoGenerateColumns="False">
+                              AutoGenerateColumns="False"
+                              PointerPressed="OnPatientListDataGridPointerPressed">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Dossier patient" Click="OnPatientListDossierPatientClick" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="N°" Binding="{Binding Number}" />
                             <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" />
