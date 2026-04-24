@@ -15,6 +15,12 @@ public interface IAppointmentService
         Patient patientDraft,
         Appointment appointmentDraft,
         CancellationToken cancellationToken = default);
+
+    Task SetInProgressAsync(Guid appointmentId, CancellationToken cancellationToken = default);
+    /// <returns>False if the appointment was not found.</returns>
+    Task<bool> SetDoneAsync(Guid appointmentId, CancellationToken cancellationToken = default);
+    Task SetWaitingAsync(Guid appointmentId, CancellationToken cancellationToken = default);
+    Task SetCancelledAsync(Guid appointmentId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

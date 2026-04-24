@@ -6,7 +6,12 @@ public sealed record QueueQuery(DateOnly Date, int Page = 1, int PageSize = 20, 
 
 public sealed record QueuePredictionItem(Guid AppointmentId, int QueueNumber, string PatientNom, string? IntervalLabel, bool IsPendingDoctorArrival);
 
-public sealed record QueueSnapshot(IReadOnlyList<Appointment> Appointments, DateTime? DoctorCheckInTime);
+/// <param name="AverageConsultationMinutesOverride">When set (positive), overrides appsettings average minutes per slot (e.g. from UI settings).</param>
+/// <param name="LastTerminatedAt">Instant of the last consultation marked done; predictions extend from here. Null until the first terminé of the day.</param>
+public sealed record QueueSnapshot(
+    IReadOnlyList<Appointment> Appointments,
+    DateTime? LastTerminatedAt,
+    int? AverageConsultationMinutesOverride = null);
 
 public interface IQueueService
 {

@@ -251,10 +251,17 @@
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Disabled"
                         ItemsSource="{Binding TreatmentInfos}"
+                        SelectedItem="{Binding SelectedTreatmentInfo}"
                         AutoGenerateColumns="False"
                         BorderThickness="0"
                         Background="Transparent"
                         CanUserSortColumns="True">
+              <DataGrid.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Supprimer la ligne"
+                            Command="{Binding DeleteSelectedTreatmentInfoCommand}" />
+                </ContextMenu>
+              </DataGrid.ContextMenu>
               <DataGrid.Columns>
                 <DataGridTextColumn Header="DATES"
                                     Binding="{Binding Date}"

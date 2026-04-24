@@ -7,6 +7,9 @@ namespace DentaireApp.DataAccess.EFCore.Repositories;
 
 public sealed class AppointmentRepository(AppDbContext dbContext) : IAppointmentRepository
 {
+    public Task<Appointment?> GetByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default) =>
+        dbContext.Appointments.FirstOrDefaultAsync(x => x.Id == appointmentId, cancellationToken);
+
     public async Task<IReadOnlyList<Appointment>> GetQueueAsync(DateOnly date, CancellationToken cancellationToken = default)
     {
         var dayStart = date.ToDateTime(TimeOnly.MinValue);

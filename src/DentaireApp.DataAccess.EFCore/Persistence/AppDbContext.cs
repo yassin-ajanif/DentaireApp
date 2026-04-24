@@ -18,7 +18,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(x => x.Nom).HasMaxLength(120).IsRequired();
             entity.Property(x => x.Telephone).HasMaxLength(30).IsRequired();
             entity.HasIndex(x => x.Telephone).IsUnique();
-            entity.HasMany(x => x.TreatmentInfos).WithOne().HasForeignKey(x => x.PatientId);
+            entity.HasMany(x => x.TreatmentInfos)
+                .WithOne()
+                .HasForeignKey(x => x.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<TreatmentInfo>(entity =>
@@ -28,7 +31,36 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasIndex(x => new { x.PatientId, x.Date });
         });
 
-        modelBuilder.Entity<Appointment>().HasKey(x => x.Id);
+        modelBuilder.Entity<Appointment>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.HasOne<Patient>()
+                .WithMany()
+                .HasForeignKey(x => x.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(x => x.StartedAt)
+                .HasConversion(
+                    value => value.HasValue
+                        ? new DateTimeOffset(value.Value.Kind == DateTimeKind.Utc
+                            ? value.Value
+                            : value.Value.ToUniversalTime()).ToUnixTimeSeconds()
+                        : (long?)null,
+                    value => value.HasValue
+                        ? DateTimeOffset.FromUnixTimeSeconds(value.Value).UtcDateTime
+                        : (DateTime?)null)
+                .HasColumnType("INTEGER");
+            entity.Property(x => x.CompletedAt)
+                .HasConversion(
+                    value => value.HasValue
+                        ? new DateTimeOffset(value.Value.Kind == DateTimeKind.Utc
+                            ? value.Value
+                            : value.Value.ToUniversalTime()).ToUnixTimeSeconds()
+                        : (long?)null,
+                    value => value.HasValue
+                        ? DateTimeOffset.FromUnixTimeSeconds(value.Value).UtcDateTime
+                        : (DateTime?)null)
+                .HasColumnType("INTEGER");
+        });
     }
 }
 

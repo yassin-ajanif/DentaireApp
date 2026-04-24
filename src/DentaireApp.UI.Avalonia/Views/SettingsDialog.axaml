@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        x:Class="DentaireApp.UI.Avalonia.Views.SettingsDialog"
+        Width="460"
+        Height="220"
+        CanResize="False"
+        Title="Paramètres">
+  <Panel>
+    <svg:Svg Path="/Assets/PatientListInfoBackground.svg"
+             Stretch="Fill"
+             Opacity="0.92"
+             IsHitTestVisible="False" />
+    <Grid Margin="16"
+          RowDefinitions="Auto,Auto,Auto,Auto"
+          ColumnDefinitions="Auto,*"
+          RowSpacing="10"
+          ColumnSpacing="10">
+      <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                 Text="Paramètres de la file d'attente"
+                 FontSize="16"
+                 FontWeight="SemiBold"
+                 Foreground="#2E4682" />
+
+      <TextBlock Grid.Row="1"
+                 Text="Temps moyen par patient (minutes)"
+                 VerticalAlignment="Center" />
+      <TextBox x:Name="AverageTimeTextBox"
+               Grid.Row="1"
+               Grid.Column="1"
+               Watermark="15" />
+
+      <TextBlock x:Name="FeedbackTextBlock"
+                 Grid.Row="2"
+                 Grid.ColumnSpan="2"
+                 Foreground="IndianRed"
+                 TextWrapping="Wrap" />
+
+      <StackPanel Grid.Row="3"
+                  Grid.ColumnSpan="2"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="8">
+        <Button Content="Annuler" Click="OnCancelClick" />
+        <Button Content="Enregistrer" Click="OnSaveClick" />
+      </StackPanel>
+    </Grid>
+  </Panel>
+</Window>

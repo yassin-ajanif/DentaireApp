@@ -31,6 +31,9 @@ public partial class PatientRecordViewModel : ViewModelBase
     [ObservableProperty]
     private string saveMessage = string.Empty;
 
+    [ObservableProperty]
+    private TreatmentInfoViewModel? selectedTreatmentInfo;
+
     public Func<bool, string, Task>? ShowSaveResultAsync { get; set; }
 
     /// <summary>Same effect as closing the dossier window (Fermer); set by the patient record window code-behind.</summary>
@@ -120,6 +123,7 @@ public partial class PatientRecordViewModel : ViewModelBase
     private void Annuler()
     {
         SaveMessage = string.Empty;
+        CloseDialog?.Invoke();
     }
 
     [RelayCommand]
@@ -128,12 +132,24 @@ public partial class PatientRecordViewModel : ViewModelBase
         TreatmentInfos.Add(new TreatmentInfoViewModel
         {
             Id = Guid.NewGuid(),
-            Date = DateTime.Today,
+            Date = DateTime.Now,
             NatureOperation = string.Empty,
             PrixConven = 0m,
             Recu = 0m,
             ARecevoir = 0m,
         });
+    }
+
+    [RelayCommand]
+    private void DeleteSelectedTreatmentInfo()
+    {
+        if (SelectedTreatmentInfo is null)
+        {
+            return;
+        }
+
+        TreatmentInfos.Remove(SelectedTreatmentInfo);
+        SelectedTreatmentInfo = null;
     }
 
     public async Task LoadForPatientAsync(Guid? patientId)

@@ -35,13 +35,13 @@ public partial class NewPatientDialog : Window
         if (string.IsNullOrWhiteSpace(NomTextBox.Text) ||
             string.IsNullOrWhiteSpace(telephone))
         {
-            FeedbackTextBlock.Text = "Nom et Telephone sont obligatoires.";
+            FeedbackTextBlock.Text = "Le nom et le téléphone sont obligatoires.";
             return;
         }
 
         if (telephone.Any(char.IsLetter))
         {
-            FeedbackTextBlock.Text = "Telephone ne doit pas contenir de lettres.";
+            FeedbackTextBlock.Text = "Le téléphone ne doit pas contenir de lettres.";
             return;
         }
 
@@ -49,7 +49,7 @@ public partial class NewPatientDialog : Window
         if (!string.IsNullOrWhiteSpace(AgeTextBox.Text) &&
             (!int.TryParse(AgeTextBox.Text, out age) || age <= 0))
         {
-            FeedbackTextBlock.Text = "Age doit etre un nombre positif.";
+            FeedbackTextBlock.Text = "L'âge doit être un nombre positif.";
             return;
         }
 

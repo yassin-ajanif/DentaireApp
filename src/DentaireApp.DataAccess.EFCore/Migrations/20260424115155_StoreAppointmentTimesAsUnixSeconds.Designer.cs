@@ -3,6 +3,7 @@ using System;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DentaireApp.DataAccess.EFCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424115155_StoreAppointmentTimesAsUnixSeconds")]
+    partial class StoreAppointmentTimesAsUnixSeconds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.15");
@@ -39,8 +42,6 @@ namespace DentaireApp.DataAccess.EFCore.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PatientId");
 
                     b.ToTable("Appointments");
                 });
@@ -109,21 +110,12 @@ namespace DentaireApp.DataAccess.EFCore.Migrations
                     b.ToTable("TreatmentInfos");
                 });
 
-            modelBuilder.Entity("DentaireApp.Business.Models.Appointments.Appointment", b =>
-                {
-                    b.HasOne("DentaireApp.Business.Models.Patients.Patient", null)
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DentaireApp.Business.Models.Patients.TreatmentInfo", b =>
                 {
                     b.HasOne("DentaireApp.Business.Models.Patients.Patient", null)
                         .WithMany("TreatmentInfos")
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

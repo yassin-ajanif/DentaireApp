@@ -1,7 +1,6 @@
 using DentaireApp.Business.Interfaces.Repositories;
 using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Patients;
-using DentaireApp.Business.Validation;
 
 namespace DentaireApp.Business.Services;
 
@@ -17,11 +16,6 @@ public class PatientRecordService(
 
     public async Task SaveTreatmentInfosAsync(Guid patientId, IReadOnlyList<TreatmentInfo> treatmentInfos, CancellationToken cancellationToken = default)
     {
-        foreach (var treatmentInfo in treatmentInfos)
-        {
-            TreatmentInfoValidator.Validate(treatmentInfo);
-        }
-
         await treatmentInfoRepository.ReplaceByPatientIdAsync(patientId, treatmentInfos, cancellationToken);
     }
 }

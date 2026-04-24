@@ -5,7 +5,6 @@ public enum AppointmentStatus
     Waiting = 0,
     InProgress = 1,
     Done = 2,
-    Skipped = 3,
     Cancelled = 4,
 }
 

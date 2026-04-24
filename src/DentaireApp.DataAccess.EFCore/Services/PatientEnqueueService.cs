@@ -48,6 +48,8 @@ public class PatientEnqueueService(AppDbContext db) : IAppointmentEnqueuePersist
                 PatientId = patient.Id,
                 QueueNumber = maxQueue + 1,
                 Status = appointmentDraft.Status,
+                StartedAt = appointmentDraft.StartedAt,
+                CompletedAt = appointmentDraft.CompletedAt,
             };
             db.Appointments.Add(appointment);
 

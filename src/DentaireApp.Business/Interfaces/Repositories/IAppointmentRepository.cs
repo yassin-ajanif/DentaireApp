@@ -4,6 +4,7 @@ namespace DentaireApp.Business.Interfaces.Repositories;
 
 public interface IAppointmentRepository
 {
+    Task<Appointment?> GetByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Appointment>> GetQueueAsync(DateOnly date, CancellationToken cancellationToken = default);
     Task<int> GetNextQueueNumberAsync(DateOnly date, CancellationToken cancellationToken = default);
     Task AddAsync(Appointment appointment, CancellationToken cancellationToken = default);

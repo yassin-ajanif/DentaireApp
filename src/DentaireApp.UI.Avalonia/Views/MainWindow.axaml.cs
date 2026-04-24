@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Input;
+using DentaireApp.UI.Avalonia.Services;
 using DentaireApp.UI.Avalonia.ViewModels;
 using System;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ namespace DentaireApp.UI.Avalonia.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly UiSettingsFileService uiSettingsService = new();
+
     public MainWindow()
     {
         InitializeComponent();
@@ -52,7 +55,7 @@ public partial class MainWindow : Window
         }
 
         var currentPatient = new NewPatientInput(item.Nom, item.Age, item.Adresse, item.Telephone);
-        var dialog = new NewPatientDialog(currentPatient, "Modifier informations patient");
+        var dialog = new NewPatientDialog(currentPatient, "Modifier les informations du patient");
         var updated = await dialog.ShowDialog<NewPatientInput?>(this);
         if (updated is null)
         {
@@ -74,6 +77,24 @@ public partial class MainWindow : Window
         vm.Queue.SelectedItem = item;
     }
 
+    private async void OnQueueListDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is not ListBox || DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        var item = FindQueueItemDataContext(e.Source as Control);
+        if (item is null)
+        {
+            return;
+        }
+
+        vm.Queue.SelectedItem = item;
+        e.Handled = true;
+        await ShowPatientRecordDialogAsync(item.PatientId);
+    }
+
     private async void OnQueueDossierPatientClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is null)
@@ -82,6 +103,46 @@ public partial class MainWindow : Window
         }
 
         await ShowPatientRecordDialogAsync(vm.Queue.SelectedItem.PatientId);
+    }
+
+    private async void OnQueueSetInProgressClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is not QueueItemViewModel item)
+        {
+            return;
+        }
+
+        await vm.Queue.SetInProgressAsync(item);
+    }
+
+    private async void OnQueueSetDoneClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is not QueueItemViewModel item)
+        {
+            return;
+        }
+
+        await vm.Queue.SetDoneAsync(item);
+    }
+
+    private async void OnQueueSetWaitingClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is not QueueItemViewModel item)
+        {
+            return;
+        }
+
+        await vm.Queue.SetWaitingAsync(item);
+    }
+
+    private async void OnQueueSetCancelledClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is not QueueItemViewModel item)
+        {
+            return;
+        }
+
+        await vm.Queue.SetCancelledAsync(item);
     }
 
     private void OnPatientListDataGridPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -106,6 +167,21 @@ public partial class MainWindow : Window
         }
 
         await ShowPatientRecordDialogAsync(item.PatientId);
+    }
+
+    private async void OnOpenSettingsClick(object? sender, RoutedEventArgs e)
+    {
+        var settings = await uiSettingsService.LoadAsync();
+        var dialog = new SettingsDialog(settings);
+        var updated = await dialog.ShowDialog<UiSettings?>(this);
+        if (updated is not null)
+        {
+            await uiSettingsService.SaveAsync(updated);
+            if (DataContext is MainWindowViewModel vm)
+            {
+                await vm.Queue.InitializeAsync();
+            }
+        }
     }
 
     private async Task ShowPatientRecordDialogAsync(Guid patientId)

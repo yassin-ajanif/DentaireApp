@@ -62,6 +62,18 @@
         <Style Selector="Button.queue-nav-next:pointerover">
             <Setter Property="Background" Value="#6A8E6E" />
         </Style>
+        <Style Selector="Button.settings-gear">
+            <Setter Property="Width" Value="38" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="#DCE5DC" />
+            <Setter Property="BorderBrush" Value="#A7B8A4" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.settings-gear:pointerover">
+            <Setter Property="Background" Value="#D0DBCF" />
+        </Style>
     </Window.Styles>
 
     <Design.DataContext>
@@ -79,8 +91,8 @@
                     <Setter Property="IsVisible" Value="False" />
                 </Style>
             </TabControl.Styles>
-            <TabItem Header="Queue">
-                <!-- 3 columns: logo band | queue (never paints into col 2) | buttons. Overflow was fixed-width queue wider than * column. -->
+            <TabItem Header="File d'attente">
+                <!-- 2 columns: logo band | queue list area -->
                 <Grid DataContext="{Binding Queue}"
                       Margin="24,52,24,0"
                       RowDefinitions="Auto,*"
@@ -89,27 +101,29 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="400" />
                         <ColumnDefinition Width="*" MinWidth="300" />
-                        <ColumnDefinition Width="Auto" MinWidth="168" />
                     </Grid.ColumnDefinitions>
                     <!-- Column 0: intentionally empty (branding / tooth art on background.svg) -->
                     <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                             Background="Transparent"
                             IsHitTestVisible="False" />
 
-                    <!-- Middle column: clip + max width so list/search never draw over the button column -->
+                    <!-- Queue column -->
                     <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
                             ClipToBounds="True"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch">
                         <Grid RowDefinitions="Auto,*"
-                              MaxWidth="540"
+                              MaxWidth="980"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Stretch">
-                            <Border Grid.Row="0"
-                                    Margin="0,0,0,18"
-                                    HorizontalAlignment="Stretch"
-                                    MaxWidth="540">
-                                <TextBox Classes="queue-search"
+                            <Grid Grid.Row="0"
+                                  Margin="0,0,0,12"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="12"
+                                  HorizontalAlignment="Stretch"
+                                  MaxWidth="980">
+                                <TextBox Grid.Column="0"
+                                         Classes="queue-search"
                                          Watermark="Rechercher un patient"
                                          Text="{Binding SearchTerm}"
                                          MinHeight="0"
@@ -117,19 +131,40 @@
                                          HorizontalAlignment="Stretch"
                                          VerticalContentAlignment="Center"
                                          HorizontalContentAlignment="Left" />
-                            </Border>
+                                <Button Grid.Column="1"
+                                        Classes="queue-nav queue-nav-nouveau"
+                                        Content="Nouveau"
+                                        Command="{Binding NouveauNumeroCommand}"
+                                        MinHeight="0"
+                                        Width="100"
+                                        Height="34"
+                                        FontSize="16"
+                                        Padding="12,0"
+                                        HorizontalAlignment="Right"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Background="#2E4682"
+                                        Foreground="White" />
+                            </Grid>
 
                             <ListBox Grid.Row="1"
                                      ItemsSource="{Binding Items}"
                                      SelectedItem="{Binding SelectedItem}"
                                      HorizontalAlignment="Stretch"
-                                     MaxWidth="540"
+                                     MaxWidth="980"
                                      Background="Transparent"
-                                     BorderThickness="0">
+                                     BorderThickness="0"
+                                     DoubleTapped="OnQueueListDoubleTapped">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,0,9" />
+                                <Setter Property="Margin" Value="0,0,10,9" />
                                 <Setter Property="Background" Value="#00FFFFFF" />
                             </Style>
                             <Style Selector="ListBoxItem:selected">
@@ -141,41 +176,70 @@
                         </ListBox.Styles>
                         <ListBox.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Traiter patient" />
-                                <MenuItem Header="Dossier patient" Click="OnQueueDossierPatientClick" />
-                                <MenuItem Header="Modifier informations patient" Click="OnEditPatientCredentialsClick" />
+                                <MenuItem Header="Commencer la session" Click="OnQueueSetInProgressClick" />
+                                <MenuItem Header="Terminer la session" Click="OnQueueSetDoneClick" />
+                                <MenuItem Header="Remettre en attente" Click="OnQueueSetWaitingClick" />
+                                <MenuItem Header="Annuler la session" Click="OnQueueSetCancelledClick" />
+                                <MenuItem Header="Dossier du patient"
+                                          IsVisible="False"
+                                          Click="OnQueueDossierPatientClick" />
+                                <MenuItem Header="Modifier les informations du patient" Click="OnEditPatientCredentialsClick" />
                             </ContextMenu>
                         </ListBox.ContextMenu>
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:QueueItemViewModel">
                                 <Border Padding="13,9"
                                         CornerRadius="4"
+                                        Background="{Binding CardBackground}"
                                         PointerPressed="OnQueueItemPointerPressed">
-                                    <!-- Badge | name | fixed gap | * stretch | time -->
-                                    <Grid ColumnDefinitions="48,Auto,72,*,Auto"
+                                    <!-- Next accent | badge | patient info | gap | * | time -->
+                                    <Grid ColumnDefinitions="Auto,42,Auto,20,*,Auto"
                                           ColumnSpacing="0">
-                                        <Border Width="40" Height="30" CornerRadius="4" Background="#D9D9D9">
+                                        <Border Grid.Column="0"
+                                                Width="{Binding NextAccentWidth}"
+                                                MinWidth="0"
+                                                CornerRadius="3,0,0,3"
+                                                Background="{Binding NextAccentBackground}"
+                                                VerticalAlignment="Stretch" />
+                                        <Border Grid.Column="1"
+                                                Width="40"
+                                                Height="30"
+                                                CornerRadius="4"
+                                                Background="#D9D9D9">
                                             <TextBlock Text="{Binding Number}"
                                                        FontSize="15"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding QueueNumberForeground}"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
                                         </Border>
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Nom}"
-                                                   Margin="12,0,0,0"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="#2E4682" />
+                                        <StackPanel Grid.Column="2"
+                                                    Margin="12,0,0,0"
+                                                    Spacing="2"
+                                                    VerticalAlignment="Center">
+                                            <Border Padding="8,2"
+                                                    CornerRadius="10"
+                                                    Background="{Binding StatusBackground}"
+                                                    HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding StatusLabel}"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{Binding StatusForeground}" />
+                                            </Border>
+                                            <TextBlock Text="{Binding Nom}"
+                                                       FontSize="17"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{Binding NameForeground}" />
+                                        </StackPanel>
                                         <!-- Static width between name and flexible space (tunes row width) -->
-                                        <Panel Grid.Column="2" Background="Transparent" />
-                                        <TextBlock Grid.Column="4"
+                                        <Panel Grid.Column="3" Background="Transparent" />
+                                        <TextBlock Grid.Column="5"
                                                    Text="{Binding PredictedInterval}"
                                                    Margin="10,0,0,0"
                                                    HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
-                                                   FontSize="15"
-                                                   Foreground="#7A9E7E" />
+                                                   FontSize="14"
+                                                   Foreground="{Binding TimeForeground}" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -184,92 +248,10 @@
                         </Grid>
                     </Border>
 
-                    <Button Grid.Row="0" Grid.Column="2"
-                            Classes="queue-nav queue-nav-nouveau"
-                            Content="Nouveau"
-                            Command="{Binding NouveauNumeroCommand}"
-                            MinHeight="0"
-                            Width="150"
-                            Height="50"
-                            Padding="12,0"
-                            HorizontalAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#2E4682"
-                            Foreground="White" />
-
-                   
-                   
-                   
-                 
-                 
-                 
-                    <Border Grid.Row="1" Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch">
-                        <StackPanel VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"
-                                    Spacing="14"
-                                    ClipToBounds="False">
-                            <Border Classes="queue-nav-shadow" HorizontalAlignment="Center">
-                                <Button Classes="queue-nav queue-nav-prev"
-                                        Command="{Binding PrecedentCommand}"
-                                        HorizontalAlignment="Center"
-                                        MinHeight="0"
-                                        Height="54"
-                                        Width="150"
-                                        HorizontalContentAlignment="Center"
-                                        VerticalContentAlignment="Center">
-                                    <Border Padding="0,0" HorizontalAlignment="Stretch">
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Center"
-                                                    Spacing="4">
-                                            <TextBlock Text="Précédent"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="White"
-                                                       TextWrapping="NoWrap" />
-                                            <svg:Svg Path="/Assets/chevron-double-up.svg"
-                                                     Width="26"
-                                                     Height="26"
-                                                     Stretch="Uniform"
-                                                     VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                </Button>
-                            </Border>
-                            <Border Classes="queue-nav-shadow" HorizontalAlignment="Center">
-                                <Button Classes="queue-nav queue-nav-next"
-                                        Command="{Binding SuivantCommand}"
-                                        HorizontalAlignment="Center"
-                                        MinHeight="0"
-                                        Height="50"
-                                        Width="150"
-                                        HorizontalContentAlignment="Center"
-                                        VerticalContentAlignment="Center">
-                                    <Border Padding="8,8" HorizontalAlignment="Stretch">
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Center"
-                                                    Spacing="4">
-                                            <TextBlock Text="Suivant"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="White"
-                                                       TextWrapping="NoWrap" />
-                                            <svg:Svg Path="/Assets/chevron-double-down.svg"
-                                                     Width="26"
-                                                     Height="26"
-                                                     Stretch="Uniform"
-                                                     VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                </Button>
-                            </Border>
-                        </StackPanel>
-                    </Border>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Patient list">
+            <TabItem Header="Liste des patients">
                 <Grid Margin="12"
                       ColumnDefinitions="400,*"
                       ColumnSpacing="16">
@@ -277,28 +259,51 @@
                     <Border Grid.Column="0"
                             Background="Transparent"
                             IsHitTestVisible="False" />
-                    <DataGrid x:Name="PatientListDataGrid"
-                              Grid.Column="1"
-                              ItemsSource="{Binding PatientList}"
-                              AutoGenerateColumns="False"
-                              PointerPressed="OnPatientListDataGridPointerPressed">
-                        <DataGrid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Dossier patient" Click="OnPatientListDossierPatientClick" />
-                            </ContextMenu>
-                        </DataGrid.ContextMenu>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="N°" Binding="{Binding Number}" />
-                            <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" />
-                            <DataGridTextColumn Header="Age" Binding="{Binding Age}" />
-                            <DataGridTextColumn Header="Téléphone" Binding="{Binding Telephone}" />
-                            <DataGridTextColumn Header="Adresse" Binding="{Binding Adresse}" />
-                            <DataGridTextColumn Header="Plage estimée" Binding="{Binding PredictedInterval}" />
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid Grid.Column="1"
+                          RowDefinitions="Auto,*"
+                          RowSpacing="10">
+                        <TextBox Grid.Row="0"
+                                 Classes="queue-search"
+                                 Watermark="Rechercher par nom ou téléphone"
+                                 Text="{Binding PatientListSearchTerm}"
+                                 MinHeight="0"
+                                 Height="34"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Left" />
+                        <DataGrid x:Name="PatientListDataGrid"
+                                  Grid.Row="1"
+                                  ItemsSource="{Binding PatientList}"
+                                  AutoGenerateColumns="False"
+                                  PointerPressed="OnPatientListDataGridPointerPressed">
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Dossier patient" Click="OnPatientListDossierPatientClick" />
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="N°" Binding="{Binding Number}" Width="70" />
+                                <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" Width="200" />
+                                <DataGridTextColumn Header="Âge" Binding="{Binding Age}" Width="70" />
+                                <DataGridTextColumn Header="Téléphone" Binding="{Binding Telephone}" Width="130" />
+                                <DataGridTextColumn Header="Adresse" Binding="{Binding Adresse}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>
+        <Button Classes="settings-gear"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,8,12,0"
+                Click="OnOpenSettingsClick"
+                ToolTip.Tip="Paramètres">
+            <svg:Svg Path="/Assets/gear.svg"
+                     Width="18"
+                     Height="18"
+                     Stretch="Uniform" />
+        </Button>
     </Grid>
 
 </Window>

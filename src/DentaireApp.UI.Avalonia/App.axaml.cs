@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using DentaireApp.Bootstrap.DependencyInjection;
+using DentaireApp.UI.Avalonia.Services;
 using DentaireApp.UI.Avalonia.ViewModels;
 using DentaireApp.UI.Avalonia.Views;
 using Microsoft.Extensions.Configuration;
@@ -61,6 +62,7 @@ public partial class App : Application
 
         var services = new ServiceCollection();
         services.AddDentaireCore(configuration);
+        services.AddSingleton<UiSettingsFileService>();
         services.AddTransient<QueueViewModel>();
         services.AddTransient<PatientRecordViewModel>();
         services.AddTransient<MainWindowViewModel>();
