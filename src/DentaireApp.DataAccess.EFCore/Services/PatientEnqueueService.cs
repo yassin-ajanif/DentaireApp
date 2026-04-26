@@ -1,6 +1,7 @@
 using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Appointments;
 using DentaireApp.Business.Models.Patients;
+using DentaireApp.DataAccess.EFCore;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,12 +35,10 @@ public class PatientEnqueueService(AppDbContext db) : IAppointmentEnqueuePersist
             }
 
             var today = DateOnly.FromDateTime(DateTime.Now);
-            var dayStart = today.ToDateTime(TimeOnly.MinValue);
-            var dayEnd = today.ToDateTime(TimeOnly.MaxValue);
+            var (utcStart, utcEnd) = QueueDayBounds.ForLocalCalendarDate(today);
 
             var maxQueue = await db.Appointments
-                .Where(x => x.StartedAt == null
-                    || (x.StartedAt >= dayStart && x.StartedAt <= dayEnd))
+                .Where(x => x.StartedAt != null && x.StartedAt >= utcStart && x.StartedAt <= utcEnd)
                 .Select(x => (int?)x.QueueNumber)
                 .MaxAsync(cancellationToken) ?? 0;
 

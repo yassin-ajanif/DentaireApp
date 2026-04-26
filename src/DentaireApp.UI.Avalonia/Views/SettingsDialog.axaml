@@ -5,6 +5,7 @@
         Width="460"
         Height="220"
         CanResize="False"
+        WindowStartupLocation="CenterOwner"
         Title="Paramètres">
   <Panel>
     <svg:Svg Path="/Assets/PatientListInfoBackground.svg"

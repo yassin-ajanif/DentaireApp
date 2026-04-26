@@ -1,5 +1,6 @@
 using DentaireApp.Business.Interfaces.Repositories;
 using DentaireApp.Business.Models.Appointments;
+using DentaireApp.DataAccess.EFCore;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,20 +13,18 @@ public sealed class AppointmentRepository(AppDbContext dbContext) : IAppointment
 
     public async Task<IReadOnlyList<Appointment>> GetQueueAsync(DateOnly date, CancellationToken cancellationToken = default)
     {
-        var dayStart = date.ToDateTime(TimeOnly.MinValue);
-        var dayEnd = date.ToDateTime(TimeOnly.MaxValue);
+        var (utcStart, utcEnd) = QueueDayBounds.ForLocalCalendarDate(date);
         return await dbContext.Appointments
-            .Where(x => x.StartedAt == null || (x.StartedAt >= dayStart && x.StartedAt <= dayEnd))
+            .Where(x => x.StartedAt != null && x.StartedAt >= utcStart && x.StartedAt <= utcEnd)
             .OrderBy(x => x.QueueNumber)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<int> GetNextQueueNumberAsync(DateOnly date, CancellationToken cancellationToken = default)
     {
-        var dayStart = date.ToDateTime(TimeOnly.MinValue);
-        var dayEnd = date.ToDateTime(TimeOnly.MaxValue);
+        var (utcStart, utcEnd) = QueueDayBounds.ForLocalCalendarDate(date);
         var max = await dbContext.Appointments
-            .Where(x => x.StartedAt == null || (x.StartedAt >= dayStart && x.StartedAt <= dayEnd))
+            .Where(x => x.StartedAt != null && x.StartedAt >= utcStart && x.StartedAt <= utcEnd)
             .Select(x => (int?)x.QueueNumber)
             .MaxAsync(cancellationToken) ?? 0;
         return max + 1;

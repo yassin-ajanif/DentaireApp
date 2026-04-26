@@ -5,6 +5,7 @@
         x:Class="DentaireApp.UI.Avalonia.Views.PatientRecordDialog"
         x:DataType="vm:PatientRecordViewModel"
         Title="Dossier patient"
+        WindowStartupLocation="CenterOwner"
         MinWidth="960"
         MinHeight="520"
         Width="1040"
@@ -78,67 +79,6 @@
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Padding" Value="20,10" />
       <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="ClipToBounds" Value="True" />
-      <Setter Property="GridLinesVisibility" Value="All" />
-      <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
-      <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
-    </Style>
-    <!-- Clip grid chrome to rounded rect; no stroke on the grid (frame is the two wrapping Borders). -->
-    <Style Selector="DataGrid.dossier-grid /template/ Border#DataGridBorder">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="ClipToBounds" Value="True" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridColumnHeader">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="#2C4483" />
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="FontSize" Value="16" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Padding" Value="10,12" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridColumnHeader TextBlock">
-      <Setter Property="TextAlignment" Value="Center" />
-      <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridCell">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
-      <Setter Property="Padding" Value="8,6" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridCell TextBlock">
-      <Setter Property="FontWeight" Value="Normal" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridRow">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridRow:pointerover">
-      <Setter Property="Background" Value="#E6EBE4" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridRow:selected">
-      <Setter Property="Background" Value="#DCE8DC" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid DataGridRow:selected:pointerover">
-      <Setter Property="Background" Value="#D4DFD2" />
-    </Style>
-    <Style Selector="DataGrid.dossier-grid TextBox">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="FontWeight" Value="Normal" />
-      <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
-      <Setter Property="BorderBrush" Value="#9AAC96" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CaretBrush" Value="{DynamicResource Color.Text.Gray}" />
-      <Setter Property="SelectionBrush" Value="#B8C9E8" />
-      <Setter Property="Padding" Value="6,4" />
     </Style>
   </Window.Styles>
 
@@ -243,13 +183,13 @@
                     HorizontalAlignment="Stretch">
               <!-- Stretch so the grid gets a real width inside the double frame; all columns use * weights so no filler column. -->
               <!-- MinHeight/MaxHeight: DataGrid in a vertical StackPanel gets unbounded height and often paints no rows until layout changes (e.g. Avalonia #19236). -->
-              <DataGrid Classes="dossier-grid"
+              <DataGrid Classes="dossier-grid treatment-grid"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         
                         MaxHeight="520"
                         VerticalScrollBarVisibility="Auto"
-                        HorizontalScrollBarVisibility="Disabled"
+                        HorizontalScrollBarVisibility="Auto"
                         ItemsSource="{Binding TreatmentInfos}"
                         SelectedItem="{Binding SelectedTreatmentInfo}"
                         AutoGenerateColumns="False"
@@ -274,15 +214,15 @@
                 <DataGridTextColumn Header="Prix Conven"
                                     Binding="{Binding PrixConven}"
                                     Width="4*"
-                                    MinWidth="100" />
+                                    MinWidth="148" />
                 <DataGridTextColumn Header="Reçu"
                                     Binding="{Binding Recu}"
                                     Width="3*"
-                                    MinWidth="84" />
+                                    MinWidth="104" />
                 <DataGridTextColumn Header="A Recevoir"
                                     Binding="{Binding ARecevoir}"
                                     Width="4*"
-                                    MinWidth="100" />
+                                    MinWidth="152" />
               </DataGrid.Columns>
               </DataGrid>
             </Border>

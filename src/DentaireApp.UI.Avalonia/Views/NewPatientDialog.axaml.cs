@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DentaireApp.Business.Validation;
 using DentaireApp.UI.Avalonia.ViewModels;
-using System.Linq;
 
 namespace DentaireApp.UI.Avalonia.Views;
 
@@ -12,17 +12,6 @@ public partial class NewPatientDialog : Window
         InitializeComponent();
     }
 
-    public NewPatientDialog(NewPatientInput currentPatient, string title)
-        : this()
-    {
-        Title = title;
-        SaveButton.Content = "Modifier";
-        NomTextBox.Text = currentPatient.Nom;
-        AgeTextBox.Text = currentPatient.Age > 0 ? currentPatient.Age.ToString() : string.Empty;
-        AdresseTextBox.Text = currentPatient.Adresse;
-        TelephoneTextBox.Text = currentPatient.Telephone;
-    }
-
     private void OnCancelClick(object? sender, RoutedEventArgs e)
     {
         Close(null);
@@ -30,27 +19,29 @@ public partial class NewPatientDialog : Window
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
-        var telephone = TelephoneTextBox.Text?.Trim() ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(NomTextBox.Text) ||
-            string.IsNullOrWhiteSpace(telephone))
+        if (string.IsNullOrWhiteSpace(NomTextBox.Text))
         {
-            FeedbackTextBlock.Text = "Le nom et le téléphone sont obligatoires.";
+            FeedbackTextBlock.Text = "Le nom est obligatoire.";
             return;
         }
 
-        if (telephone.Any(char.IsLetter))
+        var telephoneRaw = TelephoneTextBox.Text ?? string.Empty;
+        if (!TelephoneValidation.TryNormalizeMorocco(telephoneRaw, out var telephone, out var phoneError))
         {
-            FeedbackTextBlock.Text = "Le téléphone ne doit pas contenir de lettres.";
+            FeedbackTextBlock.Text = phoneError;
             return;
         }
 
-        var age = 0;
-        if (!string.IsNullOrWhiteSpace(AgeTextBox.Text) &&
-            (!int.TryParse(AgeTextBox.Text, out age) || age <= 0))
+        int? age = null;
+        if (!string.IsNullOrWhiteSpace(AgeTextBox.Text))
         {
-            FeedbackTextBlock.Text = "L'âge doit être un nombre positif.";
-            return;
+            if (!int.TryParse(AgeTextBox.Text.Trim(), out var parsed) || parsed <= 0)
+            {
+                FeedbackTextBlock.Text = "L'âge doit être un nombre positif.";
+                return;
+            }
+
+            age = parsed;
         }
 
         FeedbackTextBlock.Text = string.Empty;

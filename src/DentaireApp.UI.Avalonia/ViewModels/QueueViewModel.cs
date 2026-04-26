@@ -114,24 +114,6 @@ public partial class QueueViewModel : ViewModelBase
         }
     }
 
-    public async Task UpdatePatientCredentialsAsync(QueueItemViewModel item, NewPatientInput input)
-    {
-        var patient = await patientRepository.GetByIdAsync(item.PatientId);
-        if (patient is null)
-        {
-            return;
-        }
-
-        patient.Nom = input.Nom.Trim();
-        patient.Age = input.Age;
-        patient.Adresse = input.Adresse.Trim();
-        patient.Telephone = input.Telephone.Trim();
-        await patientRepository.UpdateAsync(patient);
-
-        await ReloadAsync();
-        SelectedItem = Items.FirstOrDefault(x => x.PatientId == patient.Id && x.Number == item.Number);
-    }
-
     private async Task ReloadAsync()
     {
         var patients = await patientRepository.GetAllAsync();
@@ -295,6 +277,23 @@ public partial class QueueViewModel : ViewModelBase
         SelectedItem = Items.FirstOrDefault(x => x.AppointmentId == item.AppointmentId);
     }
 
+    public async Task<bool> TryDeletePatientAsync(Guid patientId)
+    {
+        var deleted = await patientRepository.DeletePatientAsync(patientId);
+        if (!deleted)
+        {
+            return false;
+        }
+
+        await ReloadAsync();
+        if (SelectedItem?.PatientId == patientId)
+        {
+            SelectedItem = Items.FirstOrDefault();
+        }
+
+        return true;
+    }
+
     private static string FormatPredictedInterval(AppointmentStatus status, string? intervalLabel)
     {
         if (status is AppointmentStatus.Done or AppointmentStatus.Cancelled)
@@ -336,7 +335,7 @@ public sealed partial class QueueItemViewModel : ObservableObject
     private string predictedInterval;
 
     [ObservableProperty]
-    private int age;
+    private int? age;
 
     [ObservableProperty]
     private string adresse;
@@ -371,7 +370,7 @@ public sealed partial class QueueItemViewModel : ObservableObject
         string statusBackground,
         string statusForeground,
         string predictedInterval,
-        int age,
+        int? age,
         string adresse,
         string telephone,
         bool isSessionInProgress = false,
@@ -393,5 +392,5 @@ public sealed partial class QueueItemViewModel : ObservableObject
     }
 }
 
-public sealed record NewPatientInput(string Nom, int Age, string Adresse, string Telephone);
+public sealed record NewPatientInput(string Nom, int? Age, string Adresse, string Telephone);
 

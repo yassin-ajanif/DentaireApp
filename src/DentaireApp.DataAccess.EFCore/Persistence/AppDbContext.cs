@@ -1,3 +1,4 @@
+using System.Globalization;
 using DentaireApp.Business.Models.Appointments;
 using DentaireApp.Business.Models.Patients;
 using Microsoft.EntityFrameworkCore;
@@ -40,27 +41,32 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 .OnDelete(DeleteBehavior.Restrict);
             entity.Property(x => x.StartedAt)
                 .HasConversion(
-                    value => value.HasValue
-                        ? new DateTimeOffset(value.Value.Kind == DateTimeKind.Utc
-                            ? value.Value
-                            : value.Value.ToUniversalTime()).ToUnixTimeSeconds()
-                        : (long?)null,
-                    value => value.HasValue
-                        ? DateTimeOffset.FromUnixTimeSeconds(value.Value).UtcDateTime
-                        : (DateTime?)null)
-                .HasColumnType("INTEGER");
+                    v => v.HasValue
+                        ? v.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture)
+                        : null,
+                    v => ParseUtcDateTime(v))
+                .HasColumnType("TEXT");
             entity.Property(x => x.CompletedAt)
                 .HasConversion(
-                    value => value.HasValue
-                        ? new DateTimeOffset(value.Value.Kind == DateTimeKind.Utc
-                            ? value.Value
-                            : value.Value.ToUniversalTime()).ToUnixTimeSeconds()
-                        : (long?)null,
-                    value => value.HasValue
-                        ? DateTimeOffset.FromUnixTimeSeconds(value.Value).UtcDateTime
-                        : (DateTime?)null)
-                .HasColumnType("INTEGER");
+                    v => v.HasValue
+                        ? v.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture)
+                        : null,
+                    v => ParseUtcDateTime(v))
+                .HasColumnType("TEXT");
         });
+    }
+
+    private static DateTime? ParseUtcDateTime(string? v)
+    {
+        if (string.IsNullOrWhiteSpace(v))
+        {
+            return null;
+        }
+
+        return DateTime.Parse(
+            v.Trim(),
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal | DateTimeStyles.AllowWhiteSpaces);
     }
 }
 

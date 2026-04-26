@@ -31,5 +31,35 @@ public sealed class PatientRepository(AppDbContext dbContext) : IPatientReposito
         dbContext.Patients.Update(patient);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<bool> DeletePatientAsync(Guid patientId, CancellationToken cancellationToken = default)
+    {
+        var exists = await dbContext.Patients.AnyAsync(x => x.Id == patientId, cancellationToken);
+        if (!exists)
+        {
+            return false;
+        }
+
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await dbContext.TreatmentInfos
+                .Where(t => t.PatientId == patientId)
+                .ExecuteDeleteAsync(cancellationToken);
+            await dbContext.Appointments
+                .Where(a => a.PatientId == patientId)
+                .ExecuteDeleteAsync(cancellationToken);
+            await dbContext.Patients
+                .Where(p => p.Id == patientId)
+                .ExecuteDeleteAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
 }
 

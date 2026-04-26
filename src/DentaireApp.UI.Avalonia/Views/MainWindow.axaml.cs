@@ -47,24 +47,6 @@ public partial class MainWindow : Window
         await dialog.ShowDialog(owner);
     }
 
-    private async void OnEditPatientCredentialsClick(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is not MainWindowViewModel vm || vm.Queue.SelectedItem is not QueueItemViewModel item)
-        {
-            return;
-        }
-
-        var currentPatient = new NewPatientInput(item.Nom, item.Age, item.Adresse, item.Telephone);
-        var dialog = new NewPatientDialog(currentPatient, "Modifier les informations du patient");
-        var updated = await dialog.ShowDialog<NewPatientInput?>(this);
-        if (updated is null)
-        {
-            return;
-        }
-
-        await vm.Queue.UpdatePatientCredentialsAsync(item, updated);
-    }
-
     private void OnQueueItemPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm ||
@@ -159,14 +141,54 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void OnPatientListDossierPatientClick(object? sender, RoutedEventArgs e)
+    private async void OnPatientListDataGridDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (PatientListDataGrid.SelectedItem is not QueueItemViewModel item)
+        if (sender is not DataGrid)
         {
             return;
         }
 
+        var item = FindQueueItemDataContext(e.Source as Control);
+        if (item is null)
+        {
+            return;
+        }
+
+        PatientListDataGrid.SelectedItem = item;
+        e.Handled = true;
         await ShowPatientRecordDialogAsync(item.PatientId);
+    }
+
+    private async void OnPatientListDeletePatientClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm ||
+            PatientListDataGrid.SelectedItem is not QueueItemViewModel item ||
+            item.PatientId == Guid.Empty)
+        {
+            return;
+        }
+
+        var confirm = new ConfirmDeletePatientDialog(item.Nom);
+        if (!await confirm.ShowDialog<bool>(this))
+        {
+            return;
+        }
+
+        try
+        {
+            var ok = await vm.Queue.TryDeletePatientAsync(item.PatientId);
+            if (!ok)
+            {
+                await ShowSaveResultDialogAsync(false, "Patient introuvable.", this);
+                return;
+            }
+
+            await vm.PatientRecord.ClearIfCurrentPatientAsync(item.PatientId);
+        }
+        catch (Exception ex)
+        {
+            await ShowSaveResultDialogAsync(false, $"Échec de la suppression : {ex.Message}", this);
+        }
     }
 
     private async void OnOpenSettingsClick(object? sender, RoutedEventArgs e)
@@ -203,6 +225,8 @@ public partial class MainWindow : Window
         {
             vm.PatientRecord.ShowSaveResultAsync = previousSaveFeedback;
         }
+
+        await vm.Queue.InitializeAsync();
     }
 
     private static QueueItemViewModel? FindQueueItemDataContext(Control? control)

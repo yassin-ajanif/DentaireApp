@@ -183,7 +183,6 @@
                                 <MenuItem Header="Dossier du patient"
                                           IsVisible="False"
                                           Click="OnQueueDossierPatientClick" />
-                                <MenuItem Header="Modifier les informations du patient" Click="OnEditPatientCredentialsClick" />
                             </ContextMenu>
                         </ListBox.ContextMenu>
                         <ListBox.ItemTemplate>
@@ -271,24 +270,68 @@
                                  HorizontalAlignment="Stretch"
                                  VerticalContentAlignment="Center"
                                  HorizontalContentAlignment="Left" />
-                        <DataGrid x:Name="PatientListDataGrid"
-                                  Grid.Row="1"
-                                  ItemsSource="{Binding PatientList}"
-                                  AutoGenerateColumns="False"
-                                  PointerPressed="OnPatientListDataGridPointerPressed">
-                            <DataGrid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Dossier patient" Click="OnPatientListDossierPatientClick" />
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="N°" Binding="{Binding Number}" Width="70" />
-                                <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" Width="200" />
-                                <DataGridTextColumn Header="Âge" Binding="{Binding Age}" Width="70" />
-                                <DataGridTextColumn Header="Téléphone" Binding="{Binding Telephone}" Width="130" />
-                                <DataGridTextColumn Header="Adresse" Binding="{Binding Adresse}" Width="*" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Border Grid.Row="1"
+                                CornerRadius="14"
+                                Background="Transparent"
+                                BorderBrush="{DynamicResource Brush.Stroke.Gray}"
+                                BorderThickness="1"
+                                Padding="5"
+                                ClipToBounds="True"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                UseLayoutRounding="True">
+                            <Border CornerRadius="9"
+                                    Background="#E2E9E0"
+                                    BorderBrush="{DynamicResource Brush.Stroke.Gray}"
+                                    BorderThickness="1"
+                                    Padding="0"
+                                    ClipToBounds="True"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
+                                <DataGrid x:Name="PatientListDataGrid"
+                                          Classes="dossier-grid patient-list-grid"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch"
+                                          ItemsSource="{Binding PatientList}"
+                                          AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          BorderThickness="0"
+                                          Background="Transparent"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          CanUserSortColumns="True"
+                                          PointerPressed="OnPatientListDataGridPointerPressed"
+                                          DoubleTapped="OnPatientListDataGridDoubleTapped">
+                                    <DataGrid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Supprimer le patient" Click="OnPatientListDeletePatientClick" />
+                                        </ContextMenu>
+                                    </DataGrid.ContextMenu>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="N°"
+                                                            Binding="{Binding Number}"
+                                                            Width="80"
+                                                            MinWidth="72" />
+                                        <DataGridTextColumn Header="NOM"
+                                                            Binding="{Binding Nom}"
+                                                            Width="2*"
+                                                            MinWidth="160" />
+                                        <DataGridTextColumn Header="ÂGE"
+                                                            Binding="{Binding Age}"
+                                                            Width="80"
+                                                            MinWidth="72" />
+                                        <DataGridTextColumn Header="TÉLÉPHONE"
+                                                            Binding="{Binding Telephone}"
+                                                            Width="150"
+                                                            MinWidth="148" />
+                                        <DataGridTextColumn Header="ADRESSE"
+                                                            Binding="{Binding Adresse}"
+                                                            Width="3*"
+                                                            MinWidth="120" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>

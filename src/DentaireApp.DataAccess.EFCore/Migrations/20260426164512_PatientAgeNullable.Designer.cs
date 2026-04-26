@@ -3,6 +3,7 @@ using System;
 using DentaireApp.DataAccess.EFCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DentaireApp.DataAccess.EFCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260426164512_PatientAgeNullable")]
+    partial class PatientAgeNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.15");
@@ -23,8 +26,8 @@ namespace DentaireApp.DataAccess.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CompletedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("CompletedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("PatientId")
                         .HasColumnType("TEXT");
@@ -32,8 +35,8 @@ namespace DentaireApp.DataAccess.EFCore.Migrations
                     b.Property<int>("QueueNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("StartedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("StartedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");

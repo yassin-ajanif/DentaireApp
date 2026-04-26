@@ -4,6 +4,7 @@
         x:Class="DentaireApp.UI.Avalonia.Views.NewPatientDialog"
         Width="420"
         Height="300"
+        WindowStartupLocation="CenterOwner"
         Title="Nouveau numéro">
   <Panel>
     <svg:Svg Path="/Assets/PatientListInfoBackground.svg"
@@ -21,7 +22,10 @@
       <TextBox x:Name="AdresseTextBox" Grid.Row="2" Grid.Column="1" />
 
       <TextBlock Grid.Row="3" Text="Téléphone" />
-      <TextBox x:Name="TelephoneTextBox" Grid.Row="3" Grid.Column="1" />
+      <TextBox x:Name="TelephoneTextBox"
+               Grid.Row="3"
+               Grid.Column="1"
+               Watermark="Ex. 0612345678 ou +212 612 345 678" />
 
       <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
         <Button Content="Annuler" Click="OnCancelClick" />

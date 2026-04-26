@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using DentaireApp.Business.Interfaces.Repositories;
 using DentaireApp.Business.Interfaces.Services;
 using DentaireApp.Business.Models.Patients;
+using DentaireApp.Business.Validation;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,7 +21,7 @@ public partial class PatientRecordViewModel : ViewModelBase
     private string nom = string.Empty;
 
     [ObservableProperty]
-    private int age;
+    private int? age;
 
     [ObservableProperty]
     private string telephone = string.Empty;
@@ -60,9 +61,9 @@ public partial class PatientRecordViewModel : ViewModelBase
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(Nom) || string.IsNullOrWhiteSpace(Telephone))
+        if (string.IsNullOrWhiteSpace(Nom))
         {
-            SaveMessage = "Nom et Telephone sont obligatoires.";
+            SaveMessage = "Le nom est obligatoire.";
             if (ShowSaveResultAsync is not null)
             {
                 await ShowSaveResultAsync(false, SaveMessage);
@@ -70,9 +71,9 @@ public partial class PatientRecordViewModel : ViewModelBase
             return;
         }
 
-        if (Telephone.Any(char.IsLetter))
+        if (!TelephoneValidation.TryNormalizeMorocco(Telephone, out var normalizedPhone, out var phoneError))
         {
-            SaveMessage = "Echec: Telephone ne doit pas contenir de lettres.";
+            SaveMessage = phoneError;
             if (ShowSaveResultAsync is not null)
             {
                 await ShowSaveResultAsync(false, SaveMessage);
@@ -93,8 +94,9 @@ public partial class PatientRecordViewModel : ViewModelBase
 
         patient.Nom = Nom.Trim();
         patient.Age = Age;
-        patient.Telephone = Telephone.Trim();
+        patient.Telephone = normalizedPhone;
         patient.Adresse = Adresse.Trim();
+        Telephone = normalizedPhone;
         await patientRepository.UpdateAsync(patient);
 
         var infos = TreatmentInfos.Select(line => new TreatmentInfo
@@ -162,7 +164,7 @@ public partial class PatientRecordViewModel : ViewModelBase
         if (patientId is null)
         {
             Nom = string.Empty;
-            Age = 0;
+            Age = null;
             Telephone = string.Empty;
             Adresse = string.Empty;
             return;
@@ -172,7 +174,7 @@ public partial class PatientRecordViewModel : ViewModelBase
         if (patient is null)
         {
             Nom = string.Empty;
-            Age = 0;
+            Age = null;
             Telephone = string.Empty;
             Adresse = string.Empty;
             return;
@@ -197,6 +199,9 @@ public partial class PatientRecordViewModel : ViewModelBase
             });
         }
     }
+
+    public Task ClearIfCurrentPatientAsync(Guid patientId) =>
+        currentPatientId == patientId ? LoadForPatientAsync(null) : Task.CompletedTask;
 }
 
 public sealed partial class TreatmentInfoViewModel : ObservableObject

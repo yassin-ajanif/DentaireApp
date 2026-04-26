@@ -1,0 +1,115 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Shared treatment + patient-list tables (PatientRecordDialog, MainWindow). -->
+  <Style Selector="DataGrid.dossier-grid">
+    <Setter Property="FontFamily" Value="Consolas, 'Courier New', monospace" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="GridLinesVisibility" Value="All" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Brush.Stroke.Disabled}" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid /template/ Border#DataGridBorder">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridColumnHeader">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="#2C4483" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="10,12" />
+  </Style>
+  <!-- String headers go through ContentPresenter; set wrapping there too. -->
+  <Style Selector="DataGrid.dossier-grid DataGridColumnHeader ContentPresenter">
+    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+  </Style>
+  <!-- WrapWithOverflow still breaks inside a word if the word is wider than the column — keep MinWidths sane. -->
+  <Style Selector="DataGrid.dossier-grid DataGridColumnHeader TextBlock">
+    <Setter Property="TextAlignment" Value="Center" />
+    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridCell">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridCell TextBlock">
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridRow">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridRow:pointerover">
+    <Setter Property="Background" Value="#E6EBE4" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridRow:selected">
+    <Setter Property="Background" Value="#DCE8DC" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid DataGridRow:selected:pointerover">
+    <Setter Property="Background" Value="#D4DFD2" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid TextBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.GrayMuted}" />
+    <Setter Property="BorderBrush" Value="#9AAC96" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CaretBrush" Value="{DynamicResource Color.Text.Gray}" />
+    <Setter Property="SelectionBrush" Value="#B8C9E8" />
+    <Setter Property="Padding" Value="6,4" />
+  </Style>
+
+  <!-- Dossier treatment table: wrap long text in cells (display + edit). Read-only patient list has no TextBox cells. -->
+  <Style Selector="DataGrid.dossier-grid.treatment-grid DataGridCell">
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.treatment-grid DataGridCell TextBlock">
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="TextAlignment" Value="Left" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.treatment-grid TextBox">
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="AcceptsReturn" Value="True" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="MaxHeight" Value="220" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="TextAlignment" Value="Left" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+  </Style>
+
+  <!-- Liste des patients: blue header bar, same font size as rows, no mid-header wrapping (treatment grid unchanged). -->
+  <Style Selector="DataGrid.dossier-grid.patient-list-grid DataGridColumnHeader">
+    <Setter Property="Background" Value="#2C4483" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="10,10" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.patient-list-grid DataGridColumnHeader:pointerover">
+    <Setter Property="Background" Value="#243A6E" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.patient-list-grid DataGridColumnHeader ContentPresenter">
+    <Setter Property="TextWrapping" Value="NoWrap" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.patient-list-grid DataGridColumnHeader TextBlock">
+    <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="DataGrid.dossier-grid.patient-list-grid DataGridCell TextBlock">
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+</Styles>
