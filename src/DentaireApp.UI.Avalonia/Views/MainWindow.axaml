@@ -204,7 +204,7 @@
                                                 Width="40"
                                                 Height="30"
                                                 CornerRadius="4"
-                                                Background="#D9D9D9">
+                                                Background="{Binding QueueNumberBoxBackground}">
                                             <TextBlock Text="{Binding Number}"
                                                        FontSize="15"
                                                        FontWeight="Bold"
@@ -261,7 +261,7 @@
                             Background="Transparent"
                             IsHitTestVisible="False" />
                     <Grid Grid.Column="1"
-                          RowDefinitions="Auto,*"
+                          RowDefinitions="Auto,*,Auto"
                           RowSpacing="10">
                         <TextBox Grid.Row="0"
                                  Classes="queue-search"
@@ -334,6 +334,22 @@
                                 </DataGrid>
                             </Border>
                         </Border>
+                        <StackPanel Grid.Row="2"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="10"
+                                    VerticalAlignment="Center">
+                          <Button Content="Précédent"
+                                  Command="{Binding PatientListPrevPageCommand}"
+                                  Padding="12,6" />
+                          <TextBlock Text="{Binding PatientListPageLabel}"
+                                     VerticalAlignment="Center"
+                                     Foreground="#2E4682"
+                                     FontWeight="SemiBold" />
+                          <Button Content="Suivant"
+                                  Command="{Binding PatientListNextPageCommand}"
+                                  Padding="12,6" />
+                        </StackPanel>
                     </Grid>
                 </Grid>
             </TabItem>

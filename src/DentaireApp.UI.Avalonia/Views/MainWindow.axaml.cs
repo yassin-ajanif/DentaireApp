@@ -31,7 +31,14 @@ public partial class MainWindow : Window
 
     private async Task<NewPatientInput?> ShowNewPatientDialogAsync()
     {
-        var dialog = new NewPatientDialog();
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return null;
+        }
+
+        var suggestions = await vm.GetNewPatientDialogSuggestionsAsync();
+
+        var dialog = new NewPatientDialog(suggestions);
         return await dialog.ShowDialog<NewPatientInput?>(this);
     }
 

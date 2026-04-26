@@ -1,43 +1,97 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DentaireApp.UI.Avalonia.ViewModels"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
         x:Class="DentaireApp.UI.Avalonia.Views.NewPatientDialog"
         Width="420"
-        Height="300"
+        MinHeight="0"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
-        Title="Nouveau numéro">
-  <Panel>
-    <svg:Svg Path="/Assets/PatientListInfoBackground.svg"
+        Title="Nouveau numéro"
+        Background="{DynamicResource Color.Background.App}">
+  <Window.Styles>
+    <!-- Fluent: compact height + match client chrome to surface (avoids white strips at edges). -->
+    <Style Selector="Window">
+      <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="Window /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Background.App}" />
+    </Style>
+  </Window.Styles>
+  <!-- Single grid: SVG spans all rows so it does not add extra height beyond the form -->
+  <Grid Margin="16"
+        ClipToBounds="False"
+        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+        ColumnDefinitions="Auto,*"
+        RowSpacing="8"
+        ColumnSpacing="8">
+    <svg:Svg Grid.Row="0"
+             Grid.Column="0"
+             Grid.RowSpan="7"
+             Grid.ColumnSpan="2"
+             Path="/Assets/PatientListInfoBackground.svg"
              Stretch="Fill"
              Opacity="0.92"
-             IsHitTestVisible="False" />
-    <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="8" ColumnSpacing="8">
-      <TextBlock Text="Nom" />
-      <TextBox x:Name="NomTextBox" Grid.Column="1" MaxLength="30" />
+             IsHitTestVisible="False"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             Margin="-16"
+             ZIndex="0" />
+    <TextBlock Text="Nom" ZIndex="1" />
+    <TextBox x:Name="NomTextBox"
+             Grid.Column="1"
+             ZIndex="1"
+             MaxLength="30"
+             TextChanged="OnNameOrPhoneChanged" />
 
-      <TextBlock Grid.Row="1" Text="Âge" />
-      <TextBox x:Name="AgeTextBox" Grid.Row="1" Grid.Column="1" />
+    <ListBox x:Name="SuggestionsListBox"
+             Grid.Row="1"
+             Grid.Column="1"
+             ZIndex="1"
+             MaxHeight="110"
+             IsVisible="False"
+             SelectionChanged="OnSuggestionSelectionChanged">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:PatientSuggestion">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding DisplayLabel}" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Telephone}" FontSize="12" Opacity="0.8" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
 
-      <TextBlock Grid.Row="2" Text="Adresse" />
-      <TextBox x:Name="AdresseTextBox" Grid.Row="2" Grid.Column="1" />
+    <TextBlock Grid.Row="2" Text="Âge" ZIndex="1" />
+    <TextBox x:Name="AgeTextBox" Grid.Row="2" Grid.Column="1" ZIndex="1" />
 
-      <TextBlock Grid.Row="3" Text="Téléphone" />
-      <TextBox x:Name="TelephoneTextBox"
-               Grid.Row="3"
-               Grid.Column="1"
-               Watermark="Ex. 0612345678 ou +212 612 345 678" />
+    <TextBlock Grid.Row="3" Text="Adresse" ZIndex="1" />
+    <TextBox x:Name="AdresseTextBox" Grid.Row="3" Grid.Column="1" ZIndex="1" />
 
-      <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-        <Button Content="Annuler" Click="OnCancelClick" />
-        <Button x:Name="SaveButton" Content="Enregistrer" Click="OnSaveClick" />
-      </StackPanel>
+    <TextBlock Grid.Row="4" Text="Téléphone" ZIndex="1" />
+    <TextBox x:Name="TelephoneTextBox"
+             Grid.Row="4"
+             Grid.Column="1"
+             ZIndex="1"
+             TextChanged="OnNameOrPhoneChanged"
+             Watermark="Ex. 0612345678 ou +212 612 345 678" />
 
-      <TextBlock x:Name="FeedbackTextBlock"
-                 Grid.Row="5"
-                 Grid.ColumnSpan="2"
-                 Foreground="IndianRed"
-                 TextWrapping="Wrap" />
+    <StackPanel Grid.Row="5"
+                Grid.ColumnSpan="2"
+                ZIndex="1"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+      <Button Content="Annuler" Click="OnCancelClick" />
+      <Button x:Name="SaveButton" Content="Enregistrer" Click="OnSaveClick" />
+    </StackPanel>
+
+    <TextBlock x:Name="FeedbackTextBlock"
+               Grid.Row="6"
+               Grid.ColumnSpan="2"
+               ZIndex="1"
+               Foreground="IndianRed"
+               TextWrapping="Wrap"
+               MinHeight="0" />
     </Grid>
-  </Panel>
 </Window>
 

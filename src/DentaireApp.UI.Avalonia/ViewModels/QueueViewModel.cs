@@ -33,8 +33,9 @@ public partial class QueueViewModel : ViewModelBase
     private readonly UiSettingsFileService uiSettingsService;
     public ObservableCollection<QueueItemViewModel> Items { get; } = [];
     private readonly ObservableCollection<QueueItemViewModel> allQueueItems = [];
-    private readonly ObservableCollection<QueueItemViewModel> allPatients = [];
-    public ReadOnlyObservableCollection<QueueItemViewModel> AllPatients { get; }
+
+    /// <summary>Raised after <see cref="ReloadAsync"/> completes (queue + related UI data refreshed).</summary>
+    public event EventHandler? QueueDataReloaded;
 
     public QueueViewModel(
         IQueueService queueService,
@@ -48,7 +49,6 @@ public partial class QueueViewModel : ViewModelBase
         this.appointmentService = appointmentService;
         this.queuePredictionService = queuePredictionService;
         this.uiSettingsService = uiSettingsService;
-        AllPatients = new ReadOnlyObservableCollection<QueueItemViewModel>(allPatients);
     }
 
     partial void OnSearchTermChanged(string value) => ApplySearchFilter();
@@ -116,12 +116,13 @@ public partial class QueueViewModel : ViewModelBase
 
     private async Task ReloadAsync()
     {
-        var patients = await patientRepository.GetAllAsync();
-        var patientsById = patients.ToDictionary(p => p.Id);
-
-        var queue = await queueService.GetQueueAsync(new QueueQuery(DateOnly.FromDateTime(DateTime.Now), 1, 500, null));
+        var queue = await queueService.GetQueueAsync(
+            new QueueQuery(DateOnly.FromDateTime(DateTime.Now), 1, int.MaxValue, null));
 
         var ordered = queue.ToList();
+        var patientIds = ordered.Select(a => a.PatientId).Distinct().ToList();
+        var patients = await patientRepository.GetByIdsAsync(patientIds);
+        var patientsById = patients.ToDictionary(p => p.Id);
         // "Next" green line: first waiting by queue order. Do not use max(Done): a later ticket can be
         // terminé while smaller numbers are still en attente — they must stay ahead of the line.
         var inProgressAppointment = ordered
@@ -176,31 +177,13 @@ public partial class QueueViewModel : ViewModelBase
                 patient.Age,
                 patient.Adresse,
                 patient.Telephone,
+                appointment.Status,
                 inProgress,
                 isNext));
         }
 
-        allPatients.Clear();
-        var index = 1;
-        foreach (var patient in patients)
-        {
-            allPatients.Add(new QueueItemViewModel(
-                Guid.Empty,
-                patient.Id,
-                index++,
-                patient.Nom,
-                string.Empty,
-                "#E7ECEF",
-                "#2E4682",
-                string.Empty,
-                patient.Age,
-                patient.Adresse,
-                patient.Telephone,
-                isSessionInProgress: false,
-                isNextInQueue: false));
-        }
-
         ApplySearchFilter();
+        QueueDataReloaded?.Invoke(this, EventArgs.Empty);
     }
 
     private void ApplySearchFilter()
@@ -307,7 +290,7 @@ public partial class QueueViewModel : ViewModelBase
     private static (string Label, string Background, string Foreground) GetStatusStyle(AppointmentStatus status) => status switch
     {
         AppointmentStatus.InProgress => ("En cours", "#E7F0FF", "#1E4EAA"),
-        AppointmentStatus.Done => ("Terminé", "#E6F7EA", "#237A43"),
+        AppointmentStatus.Done => ("Terminé", "#D5DADE", "#4A5568"),
         AppointmentStatus.Cancelled => ("Annulé", "#FCEBEC", "#B4232A"),
         _ => ("En attente", "#FFF5E6", "#9A5A00"),
     };
@@ -349,15 +332,33 @@ public sealed partial class QueueItemViewModel : ObservableObject
     /// <summary>Smallest-queue waiting patient when none en cours; otherwise first waiting after the en cours ticket.</summary>
     public bool IsNextInQueue { get; }
 
-    public string CardBackground => IsSessionInProgress ? "#2E4682" : "Transparent";
+    public AppointmentStatus Status { get; }
 
-    public string NameForeground => IsSessionInProgress ? "#FFFFFF" : "#2E4682";
+    public string CardBackground =>
+        IsSessionInProgress ? "#2E4682" :
+        Status == AppointmentStatus.Done ? "#E8EAED" :
+        "Transparent";
 
-    public string TimeForeground => IsSessionInProgress ? "#B8E8C4" : "#7A9E7E";
+    public string NameForeground =>
+        IsSessionInProgress ? "#FFFFFF" :
+        Status == AppointmentStatus.Done ? "#5F6B7A" :
+        "#2E4682";
 
-    public string QueueNumberForeground => IsSessionInProgress ? "#FFFFFF" : "#2E4682";
+    public string TimeForeground =>
+        IsSessionInProgress ? "#B8E8C4" :
+        Status == AppointmentStatus.Done ? "#8B95A3" :
+        "#7A9E7E";
 
-    public double NextAccentWidth => IsNextInQueue ? 4 : 0;
+    public string QueueNumberForeground =>
+        IsSessionInProgress ? "#FFFFFF" :
+        Status == AppointmentStatus.Done ? "#5F6B7A" :
+        "#2E4682";
+
+    public string QueueNumberBoxBackground =>
+        Status == AppointmentStatus.Done ? "#D1D5DB" :
+        "#D9D9D9";
+
+    public double NextAccentWidth => IsNextInQueue ? 8 : 0;
 
     public string NextAccentBackground => IsNextInQueue ? "#7A9E7E" : "Transparent";
 
@@ -373,6 +374,7 @@ public sealed partial class QueueItemViewModel : ObservableObject
         int? age,
         string adresse,
         string telephone,
+        AppointmentStatus status = AppointmentStatus.Waiting,
         bool isSessionInProgress = false,
         bool isNextInQueue = false)
     {
@@ -387,10 +389,16 @@ public sealed partial class QueueItemViewModel : ObservableObject
         this.age = age;
         this.adresse = adresse;
         this.telephone = telephone;
+        Status = status;
         IsSessionInProgress = isSessionInProgress;
         IsNextInQueue = isNextInQueue;
     }
 }
 
 public sealed record NewPatientInput(string Nom, int? Age, string Adresse, string Telephone);
+
+public sealed record PatientSuggestion(string Nom, string Telephone, int? Age, string Adresse)
+{
+    public string DisplayLabel => $"{Nom} {(Age is null ? string.Empty : $"- {Age} ans")}".Trim();
+}
 
