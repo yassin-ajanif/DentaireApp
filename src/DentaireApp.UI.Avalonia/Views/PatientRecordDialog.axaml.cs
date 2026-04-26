@@ -33,4 +33,20 @@ public partial class PatientRecordDialog : Window
     private void CloseDossier() => Close();
 
     private void OnFermerClick(object? sender, RoutedEventArgs e) => CloseDossier();
+
+    private void OnDeleteTreatmentLineClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not PatientRecordViewModel vm || sender is not MenuItem menuItem)
+        {
+            return;
+        }
+
+        var treatmentInfo = menuItem.DataContext as TreatmentInfoViewModel;
+        if (treatmentInfo is null && menuItem.Parent is ContextMenu contextMenu)
+        {
+            treatmentInfo = (contextMenu.PlacementTarget as Control)?.DataContext as TreatmentInfoViewModel;
+        }
+
+        vm.DeleteTreatmentInfo(treatmentInfo);
+    }
 }

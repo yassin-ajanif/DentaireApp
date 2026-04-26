@@ -131,6 +131,7 @@
                          Grid.Column="1"
                          Grid.ColumnSpan="3"
                          Classes="dossier-field"
+                         MaxLength="30"
                          Text="{Binding Nom}" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Classes="dossier-label" Text="Age" TextDecorations="Underline" />
@@ -183,7 +184,8 @@
                     HorizontalAlignment="Stretch">
               <!-- Stretch so the grid gets a real width inside the double frame; all columns use * weights so no filler column. -->
               <!-- MinHeight/MaxHeight: DataGrid in a vertical StackPanel gets unbounded height and often paints no rows until layout changes (e.g. Avalonia #19236). -->
-              <DataGrid Classes="dossier-grid treatment-grid"
+              <DataGrid x:Name="TreatmentDataGrid"
+                        Classes="dossier-grid treatment-grid"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         
@@ -196,12 +198,16 @@
                         BorderThickness="0"
                         Background="Transparent"
                         CanUserSortColumns="True">
-              <DataGrid.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="Supprimer la ligne"
-                            Command="{Binding DeleteSelectedTreatmentInfoCommand}" />
-                </ContextMenu>
-              </DataGrid.ContextMenu>
+              <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                  <Setter Property="ContextMenu">
+                    <ContextMenu>
+                      <MenuItem Header="Supprimer la ligne"
+                                Click="OnDeleteTreatmentLineClick" />
+                    </ContextMenu>
+                  </Setter>
+                </Style>
+              </DataGrid.Styles>
               <DataGrid.Columns>
                 <DataGridTextColumn Header="DATES"
                                     Binding="{Binding Date}"

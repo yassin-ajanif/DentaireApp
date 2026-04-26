@@ -13,7 +13,7 @@
              IsHitTestVisible="False" />
     <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="8" ColumnSpacing="8">
       <TextBlock Text="Nom" />
-      <TextBox x:Name="NomTextBox" Grid.Column="1" />
+      <TextBox x:Name="NomTextBox" Grid.Column="1" MaxLength="30" />
 
       <TextBlock Grid.Row="1" Text="Âge" />
       <TextBox x:Name="AgeTextBox" Grid.Row="1" Grid.Column="1" />

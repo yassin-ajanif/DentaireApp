@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyTitle>ESPACE DENTAIRE</AssemblyTitle>
+    <Product>ESPACE DENTAIRE</Product>
   </PropertyGroup>
 
   <ItemGroup>

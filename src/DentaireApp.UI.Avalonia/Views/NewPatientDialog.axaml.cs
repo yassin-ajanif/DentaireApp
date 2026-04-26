@@ -19,9 +19,16 @@ public partial class NewPatientDialog : Window
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(NomTextBox.Text))
+        var name = NomTextBox.Text?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name))
         {
             FeedbackTextBlock.Text = "Le nom est obligatoire.";
+            return;
+        }
+
+        if (name.Length > PatientValidation.MaxNameLength)
+        {
+            FeedbackTextBlock.Text = $"Le nom ne doit pas dépasser {PatientValidation.MaxNameLength} caractères.";
             return;
         }
 
@@ -47,7 +54,7 @@ public partial class NewPatientDialog : Window
         FeedbackTextBlock.Text = string.Empty;
 
         var input = new NewPatientInput(
-            NomTextBox.Text.Trim(),
+            name,
             age,
             AdresseTextBox.Text?.Trim() ?? string.Empty,
             telephone);

@@ -10,7 +10,7 @@
         Icon="/Assets/avalonia-logo.ico"
         MinWidth="1160"
         MinHeight="620"
-        Title="DentaireApp.UI.Avalonia">
+        Title="ESPACE DENTAIRE">
 
     <Window.Styles>
         <Style Selector="TextBox.queue-search">
@@ -191,8 +191,8 @@
                                         CornerRadius="4"
                                         Background="{Binding CardBackground}"
                                         PointerPressed="OnQueueItemPointerPressed">
-                                    <!-- Next accent | badge | patient info | gap | * | time -->
-                                    <Grid ColumnDefinitions="Auto,42,Auto,20,*,Auto"
+                                    <!-- Next accent | badge | patient info (flex) | gap | time -->
+                                    <Grid ColumnDefinitions="Auto,42,*,20,Auto"
                                           ColumnSpacing="0">
                                         <Border Grid.Column="0"
                                                 Width="{Binding NextAccentWidth}"
@@ -228,11 +228,13 @@
                                             <TextBlock Text="{Binding Nom}"
                                                        FontSize="17"
                                                        FontWeight="SemiBold"
+                                                       TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis"
                                                        Foreground="{Binding NameForeground}" />
                                         </StackPanel>
-                                        <!-- Static width between name and flexible space (tunes row width) -->
+                                        <!-- Fixed spacer between name and time range -->
                                         <Panel Grid.Column="3" Background="Transparent" />
-                                        <TextBlock Grid.Column="5"
+                                        <TextBlock Grid.Column="4"
                                                    Text="{Binding PredictedInterval}"
                                                    Margin="10,0,0,0"
                                                    HorizontalAlignment="Right"

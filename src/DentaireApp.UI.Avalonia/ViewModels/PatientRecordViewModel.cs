@@ -71,6 +71,17 @@ public partial class PatientRecordViewModel : ViewModelBase
             return;
         }
 
+        var normalizedName = Nom.Trim();
+        if (normalizedName.Length > PatientValidation.MaxNameLength)
+        {
+            SaveMessage = $"Le nom ne doit pas dépasser {PatientValidation.MaxNameLength} caractères.";
+            if (ShowSaveResultAsync is not null)
+            {
+                await ShowSaveResultAsync(false, SaveMessage);
+            }
+            return;
+        }
+
         if (!TelephoneValidation.TryNormalizeMorocco(Telephone, out var normalizedPhone, out var phoneError))
         {
             SaveMessage = phoneError;
@@ -92,7 +103,7 @@ public partial class PatientRecordViewModel : ViewModelBase
             return;
         }
 
-        patient.Nom = Nom.Trim();
+        patient.Nom = normalizedName;
         patient.Age = Age;
         patient.Telephone = normalizedPhone;
         patient.Adresse = Adresse.Trim();
@@ -145,13 +156,21 @@ public partial class PatientRecordViewModel : ViewModelBase
     [RelayCommand]
     private void DeleteSelectedTreatmentInfo()
     {
-        if (SelectedTreatmentInfo is null)
+        DeleteTreatmentInfo(SelectedTreatmentInfo);
+    }
+
+    public void DeleteTreatmentInfo(TreatmentInfoViewModel? treatmentInfo)
+    {
+        if (treatmentInfo is null)
         {
             return;
         }
 
-        TreatmentInfos.Remove(SelectedTreatmentInfo);
-        SelectedTreatmentInfo = null;
+        TreatmentInfos.Remove(treatmentInfo);
+        if (ReferenceEquals(SelectedTreatmentInfo, treatmentInfo))
+        {
+            SelectedTreatmentInfo = null;
+        }
     }
 
     public async Task LoadForPatientAsync(Guid? patientId)

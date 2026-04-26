@@ -1,6 +1,7 @@
 using System.Globalization;
 using DentaireApp.Business.Models.Appointments;
 using DentaireApp.Business.Models.Patients;
+using DentaireApp.Business.Validation;
 using Microsoft.EntityFrameworkCore;
 
 namespace DentaireApp.DataAccess.EFCore.Persistence;
@@ -16,7 +17,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         modelBuilder.Entity<Patient>(entity =>
         {
             entity.HasKey(x => x.Id);
-            entity.Property(x => x.Nom).HasMaxLength(120).IsRequired();
+            entity.Property(x => x.Nom).HasMaxLength(PatientValidation.MaxNameLength).IsRequired();
             entity.Property(x => x.Telephone).HasMaxLength(30).IsRequired();
             entity.HasIndex(x => x.Telephone).IsUnique();
             entity.HasMany(x => x.TreatmentInfos)
